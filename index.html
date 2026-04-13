@@ -4,237 +4,117 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Portal Absensi Calsub.id</title>
-    
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;800&display=swap" rel="stylesheet">
-    
     <script src="https://cdn.tailwindcss.com"></script>
-    
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js"></script>
 
     <style>
-        body {
-            font-family: 'Poppins', sans-serif;
-            background-color: #050505;
-            color: #ffffff;
-            overflow-x: hidden;
-        }
-
-        /* Latar Belakang Jaring (Cyber Grid) Interaktif */
+        body { font-family: 'Poppins', sans-serif; background-color: #050505; color: #ffffff; overflow-x: hidden; }
         .cyber-grid {
-            position: fixed;
-            top: 0; left: 0; width: 100vw; height: 100vh;
-            background-size: 50px 50px;
-            background-image: 
-                linear-gradient(to right, rgba(255, 255, 255, 0.05) 1px, transparent 1px),
-                linear-gradient(to bottom, rgba(255, 255, 255, 0.05) 1px, transparent 1px);
-            mask-image: radial-gradient(circle at center, black 30%, transparent 80%);
-            -webkit-mask-image: radial-gradient(circle at center, black 30%, transparent 80%);
+            position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
+            background-size: 40px 40px;
+            background-image: linear-gradient(to right, rgba(255, 255, 255, 0.03) 1px, transparent 1px), linear-gradient(to bottom, rgba(255, 255, 255, 0.03) 1px, transparent 1px);
+            mask-image: radial-gradient(circle at center, black 40%, transparent 90%);
             z-index: -1;
-            animation: gridMove 20s linear infinite;
         }
-
-        @keyframes gridMove {
-            0% { background-position: 0 0; }
-            100% { background-position: 50px 50px; }
-        }
-
-        /* Efek Kaca (Glassmorphism) & Neon */
-        .glass-card {
-            background: rgba(25, 25, 25, 0.6);
-            backdrop-filter: blur(12px);
-            -webkit-backdrop-filter: blur(12px);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            box-shadow: 0 0 30px rgba(255, 255, 255, 0.05), inset 0 0 20px rgba(255, 255, 255, 0.02);
-        }
-
-        .input-neon:focus {
-            outline: none;
-            border-color: rgba(255, 255, 255, 0.5);
-            box-shadow: 0 0 15px rgba(255, 255, 255, 0.2);
-        }
-
-        @keyframes scan {
-            0% { transform: translateY(0); opacity: 0; }
-            10% { opacity: 1; }
-            90% { opacity: 1; }
-            100% { transform: translateY(12rem); opacity: 0; }
-        }
+        .glass-card { background: rgba(20, 20, 20, 0.7); backdrop-filter: blur(15px); border: 1px solid rgba(255, 255, 255, 0.1); }
+        .btn-glow:hover { box-shadow: 0 0 20px rgba(255, 255, 255, 0.3); }
     </style>
 </head>
 <body class="min-h-screen flex flex-col items-center justify-center p-4">
-
     <div class="cyber-grid"></div>
 
-    <img src="https://raw.githubusercontent.com/umartaufik15m/Absensi-Calsub/refs/heads/main/W%20CALSUB_page-0001.jpg" alt="Calsub.id Logo" class="w-64 mb-8 drop-shadow-[0_0_15px_rgba(255,255,255,0.3)]" onerror="this.style.display='none'; document.getElementById('logo-text').style.display='block';">
-    <h1 id="logo-text" class="text-4xl font-black italic tracking-wider mb-8 hidden">CALSUB<span class="text-gray-400">.id</span></h1>
+    <img src="https://raw.githubusercontent.com/umartaufik15m/Absensi-Calsub/refs/heads/main/W%20CALSUB_page-0001.jpg" alt="Calsub Logo" class="w-48 mb-6 drop-shadow-xl">
 
-    <div id="app" class="glass-card p-8 rounded-3xl w-full max-w-md relative overflow-hidden transition-all duration-500">
+    <div id="app" class="glass-card p-8 rounded-[2rem] w-full max-w-md shadow-2xl transition-all duration-500">
         
         <div id="login-section">
-            <h2 class="text-xl font-semibold mb-6 text-center tracking-wide">Portal Absensi Karyawan</h2>
-            
-            <div class="space-y-4 mb-8">
-                <div class="relative">
-                    <span class="absolute inset-y-0 left-0 flex items-center pl-4 text-gray-400">
-                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path></svg>
-                    </span>
-                    <input type="text" id="emp-id" placeholder="ID Karyawan" class="w-full pl-12 p-4 bg-black/50 border border-gray-600 rounded-xl text-white input-neon transition-all uppercase placeholder-gray-500">
-                </div>
-
-                <div class="relative">
-                    <span class="absolute inset-y-0 left-0 flex items-center pl-4 text-gray-400">
-                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4a1 1 0 01-1-1v-2.586a1 1 0 01.293-.707l5.964-5.964A6 6 0 1121 9z"></path></svg>
-                    </span>
-                    <input type="password" id="emp-pin" placeholder="PIN 4 Angka" class="w-full pl-12 p-4 bg-black/50 border border-gray-600 rounded-xl text-white input-neon transition-all tracking-[0.5em]">
-                </div>
+            <h2 class="text-center text-lg font-semibold mb-6 tracking-widest text-gray-400">LOG IN PEGAWAI</h2>
+            <div class="space-y-4 mb-6">
+                <input type="text" id="emp-id" placeholder="ID KARYAWAN" class="w-full p-4 bg-black/40 border border-white/10 rounded-2xl text-center focus:border-white/40 transition-all outline-none">
+                <input type="password" id="emp-pin" placeholder="PIN 4 ANGKA" class="w-full p-4 bg-black/40 border border-white/10 rounded-2xl text-center tracking-[0.8em] focus:border-white/40 transition-all outline-none">
             </div>
-
-            <button onclick="checkLogin()" class="w-full bg-white text-black font-bold py-4 rounded-xl hover:bg-gray-200 transition-all shadow-[0_0_15px_rgba(255,255,255,0.4)] active:scale-95">
-                MASUK
-            </button>
+            <button onclick="handleLogin()" class="w-full bg-white text-black font-extrabold py-4 rounded-2xl btn-glow transition-all active:scale-95">MASUK SISTEM</button>
         </div>
 
-        <div id="action-section" class="hidden">
-            <h2 id="user-greeting" class="text-2xl font-bold text-center mb-2">Halo, Karyawan</h2>
-            <p class="text-center text-gray-400 text-sm mb-6">Pastikan wajah terlihat jelas</p>
+        <div id="action-section" class="hidden text-center">
+            <h2 id="greeting" class="text-2xl font-bold mb-1">Halo, Tim Calsub</h2>
+            <p class="text-gray-500 text-sm mb-6">Siap beraksi di Bulak Kapal hari ini?</p>
             
-            <div class="relative rounded-2xl overflow-hidden border border-gray-600 mb-6 bg-black shadow-inner h-48">
+            <div class="relative rounded-3xl overflow-hidden mb-6 h-48 bg-black border border-white/10">
                 <video id="video" class="w-full h-full object-cover" autoplay playsinline></video>
-                <div class="absolute inset-0 border-2 border-white/20 rounded-2xl pointer-events-none"></div>
-                <div class="absolute top-0 left-0 w-full h-1 bg-white/50 shadow-[0_0_10px_white] animate-[scan_2s_ease-in-out_infinite]"></div>
+                <div class="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent"></div>
             </div>
-            
-            <button onclick="doAbsen('masuk')" class="w-full bg-white/10 border border-white text-white font-bold py-4 rounded-xl mb-4 hover:bg-white hover:text-black transition-all active:scale-95">
-                [ ABSEN MASUK ]
-            </button>
-            
-            <div class="border-t border-gray-700 my-6 pt-6">
-                <p class="text-sm text-gray-400 mb-2">Laporan Akhir Shift:</p>
-                <input type="number" id="prod-total" placeholder="Total Kaos Di-press" class="w-full p-4 bg-black/50 border border-gray-600 rounded-xl text-white input-neon mb-4">
-                
-                <label class="flex items-center space-x-3 mb-6 cursor-pointer bg-black/30 p-4 rounded-xl border border-gray-700 hover:border-gray-500 transition">
-                    <input type="checkbox" id="overtime-check" class="w-5 h-5 accent-white rounded bg-black border-gray-600">
-                    <span class="text-sm font-medium">Lembur hari ini</span>
-                </label>
 
-                <button onclick="doAbsen('pulang')" class="w-full bg-white text-black font-bold py-4 rounded-xl hover:bg-gray-200 transition-all shadow-[0_0_15px_rgba(255,255,255,0.2)] active:scale-95">
-                    ABSEN PULANG & LAPOR
-                </button>
+            <button onclick="submitAbsen('masuk')" class="w-full border-2 border-white/20 hover:border-white/60 text-white font-bold py-4 rounded-2xl mb-4 transition-all">ABSEN MASUK</button>
+            
+            <div class="pt-6 border-t border-white/10">
+                <input type="number" id="prod-total" placeholder="Total Produksi (Pcs)" class="w-full p-4 bg-black/40 border border-white/10 rounded-2xl text-center mb-4 outline-none">
+                <label class="flex items-center justify-center space-x-3 mb-6 cursor-pointer">
+                    <input type="checkbox" id="is-ot" class="w-5 h-5 accent-white">
+                    <span class="text-sm">Saya Kerja Lembur</span>
+                </label>
+                <button onclick="submitAbsen('pulang')" class="w-full bg-white text-black font-extrabold py-4 rounded-2xl btn-glow transition-all">ABSEN PULANG & LAPOR</button>
             </div>
         </div>
-
-        <p id="msg" class="mt-6 text-center text-sm font-medium h-4"></p>
+        <p id="notif" class="mt-4 text-center text-xs font-medium"></p>
     </div>
 
     <script>
-        // === KONEKSI SUPABASE TERINTEGRASI ===
-        const SUPABASE_URL = 'https://wcjzperckywcskcrhgrv.supabase.co';
-        const SUPABASE_KEY = 'sb_publishable_BQmfryY0U4OMSuw7g2M7CA_WR5fdO5L';
-        const supabase = supabase.createClient(SUPABASE_URL, SUPABASE_KEY); 
+        const SB_URL = 'https://wcjzperckywcskcrhgrv.supabase.co';
+        const SB_KEY = 'sb_publishable_BQmfryY0U4OMSuw7g2M7CA_WR5fdO5L';
+        const supabaseClient = supabase.createClient(SB_URL, SB_KEY);
 
-        // Koordinat Workshop Bekasi Timur (Bulak Kapal)
-        const WORKSHOP_COORDS = { lat: -6.2510688, lng: 107.0253873 };
-        let currentStream = null;
+        const WORKSHOP_LOC = { lat: -6.2510688, lng: 107.0253873 };
+        let activeUser = null;
 
-        function showMessage(text, isError = false) {
-            const msgEl = document.getElementById('msg');
-            msgEl.innerText = text;
-            msgEl.className = `mt-6 text-center text-sm font-medium h-4 ${isError ? 'text-red-400' : 'text-green-400'}`;
-            setTimeout(() => msgEl.innerText = '', 4000);
-        }
-
-        async function checkLogin() {
-            const id = document.getElementById('emp-id').value.toUpperCase();
+        async function handleLogin() {
+            const id = document.getElementById('emp-id').value;
             const pin = document.getElementById('emp-pin').value;
             
-            if(id && pin) {
-                document.getElementById('login-section').style.display = 'none';
-                document.getElementById('action-section').classList.remove('hidden');
-                document.getElementById('user-greeting').innerText = "Halo, " + id;
-                startCamera();
-            } else {
-                showMessage("ID dan PIN harus diisi!", true);
-            }
-        }
+            const { data, error } = await supabaseClient.from('profiles').select('*').eq('employee_id', id).eq('pin', pin).single();
 
-        async function startCamera() {
-            try {
-                currentStream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: "user" } });
-                document.getElementById('video').srcObject = currentStream;
-            } catch (err) {
-                showMessage("Gagal akses kamera! Pastikan izin diberikan.", true);
-            }
-        }
-
-        function getDistance(lat1, lon1, lat2, lon2) {
-            const R = 6371e3; 
-            const dLat = (lat2 - lat1) * Math.PI / 180;
-            const dLon = (lon2 - lon1) * Math.PI / 180;
-            const a = Math.sin(dLat/2) * Math.sin(dLat/2) + Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) * Math.sin(dLon/2) * Math.sin(dLon/2);
-            return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
-        }
-
-        async function doAbsen(tipe) {
-            showMessage("Memeriksa lokasi & memproses data...");
-            
-            if (!navigator.geolocation) {
-                showMessage("GPS tidak didukung di HP ini.", true);
+            if (error || !data) {
+                document.getElementById('notif').innerText = "ID atau PIN salah!";
+                document.getElementById('notif').className = "mt-4 text-center text-xs text-red-500";
                 return;
             }
 
-            navigator.geolocation.getCurrentPosition(
-                async (pos) => {
-                    const dist = getDistance(pos.coords.latitude, pos.coords.longitude, WORKSHOP_COORDS.lat, WORKSHOP_COORDS.lng);
-                    
-                    if(dist > 100) { 
-                        alert(`Gagal! Anda berjarak ${Math.round(dist)}m dari workshop. Harus di area Bulak Kapal.`);
-                        showMessage("Di luar area workshop.", true);
-                        return;
-                    }
+            activeUser = data;
+            document.getElementById('login-section').classList.add('hidden');
+            document.getElementById('action-section').classList.remove('hidden');
+            document.getElementById('greeting').innerText = "Halo, " + data.name;
+            startCam();
+        }
 
-                    const idKaryawan = document.getElementById('emp-id').value.toUpperCase();
-                    const isLembur = document.getElementById('overtime-check').checked;
-                    const totalProd = document.getElementById('prod-total').value || 0;
+        async function startCam() {
+            const stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: "user" } });
+            document.getElementById('video').srcObject = stream;
+        }
 
-                    if (tipe === 'pulang' && !totalProd) {
-                        alert("Harap isi Total Produksi sebelum pulang!");
-                        return;
-                    }
+        async function submitAbsen(tipe) {
+            document.getElementById('notif').innerText = "Memproses...";
+            
+            navigator.geolocation.getCurrentPosition(async (pos) => {
+                const prod = document.getElementById('prod-total').value || 0;
+                const ot = document.getElementById('is-ot').checked;
 
-                    // --- LOGIKA INSERT SUPABASE ---
-                    const { data, error } = await supabase
-                        .from('attendance')
-                        .insert([
-                            {
-                                employee_id: idKaryawan,
-                                status: tipe, // 'masuk' atau 'pulang'
-                                location_in: `${pos.coords.latitude}, ${pos.coords.longitude}`,
-                                production_total: parseInt(totalProd),
-                                is_overtime: isLembur
-                            }
-                        ]);
+                const { error } = await supabaseClient.from('attendance').insert([{
+                    employee_id: activeUser.employee_id,
+                    employee_name: activeUser.name,
+                    status: tipe,
+                    location: `${pos.coords.latitude},${pos.coords.longitude}`,
+                    production_total: parseInt(prod),
+                    is_overtime: ot
+                }]);
 
-                    if (error) {
-                        console.error('Error Supabase:', error);
-                        showMessage("Gagal menyimpan ke database!", true);
-                        return;
-                    }
-                    // -----------------------------
-
-                    showMessage(`Berhasil Absen ${tipe.toUpperCase()}!`);
-                    
-                    if(tipe === 'pulang') {
-                        setTimeout(() => alert(`Laporan Masuk!\nProduksi: ${totalProd} Kaos\nLembur: ${isLembur ? 'Ya' : 'Tidak'}\n\nTerima kasih atas kerja kerasnya hari ini!`), 500);
-                        setTimeout(() => location.reload(), 3000);
-                    } else {
-                        setTimeout(() => location.reload(), 2000);
-                    }
-                },
-                (err) => {
-                    showMessage("Gagal deteksi GPS. Pastikan GPS HP nyala.", true);
-                },
-                { enableHighAccuracy: true, timeout: 5000, maximumAge: 0 }
-            );
+                if (!error) {
+                    alert(`Berhasil ${tipe}!`);
+                    location.reload();
+                } else {
+                    alert("Gagal koneksi database.");
+                }
+            });
         }
     </script>
 </body>
