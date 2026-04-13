@@ -135,24 +135,55 @@
             if(viewId === 'view-camera') startCam();
         }
 
-        async function handleLogin() {
-            const id = document.getElementById('emp-id').value;
-            const pin = document.getElementById('emp-pin').value;
-            if(!id || !pin) return alert("Isi ID & PIN!");
+      async function handleLogin() {
+            // Ubah teks tombol biar kita tahu dia lagi mikir
+            const btn = document.querySelector('button[onclick="handleLogin()"]');
+            btn.innerText = "MEMERIKSA...";
 
-            const { data, error } = await supabase.from('profiles').select('*').eq('employee_id', id).eq('pin', pin).single();
+            try {
+                // Tambahin .trim() biar spasi yang nggak sengaja kepencet otomatis kehapus
+                const id = document.getElementById('emp-id').value.trim();
+                const pin = document.getElementById('emp-pin').value.trim();
+                
+                if(!id || !pin) {
+                    btn.innerText = "MASUK";
+                    return alert("Isi ID & PIN dulu bos!");
+                }
 
-            if (error || !data) {
-                alert("ID atau PIN SALAH!");
-                return;
+                // Cek ke Supabase
+                const { data, error } = await supabase
+                    .from('profiles')
+                    .select('*')
+                    .eq('employee_id', id)
+                    .eq('pin', pin)
+                    .single();
+
+                // KALAU ADA ERROR DARI SUPABASE, MUNCULIN DI SINI!
+                if (error) {
+                    btn.innerText = "MASUK";
+                    alert("Gagal Login!\nError Supabase: " + error.message);
+                    console.log("Detail Error:", error);
+                    return;
+                }
+
+                if (!data) {
+                    btn.innerText = "MASUK";
+                    alert("ID atau PIN SALAH!");
+                    return;
+                }
+
+                // Kalau berhasil
+                activeUser = data;
+                document.getElementById('prof-name').innerText = data.name;
+                document.getElementById('prof-dept').innerText = data.department;
+                changeView('view-profile');
+                btn.innerText = "MASUK";
+
+            } catch (err) {
+                btn.innerText = "MASUK";
+                alert("Wah ada error di kodenya: " + err.message);
             }
-
-            activeUser = data;
-            document.getElementById('prof-name').innerText = data.name;
-            document.getElementById('prof-dept').innerText = data.department;
-            changeView('view-profile');
         }
-
         // --- LOGIKA KAMERA BARU (CEKREK) ---
         let streamObj = null;
 
