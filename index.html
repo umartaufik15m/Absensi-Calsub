@@ -18,95 +18,116 @@
             z-index: -1;
         }
         .glass-card { background: rgba(15, 15, 15, 0.8); backdrop-filter: blur(20px); border: 1px solid rgba(255, 255, 255, 0.1); }
-        .gradient-icon { filter: drop-shadow(0 0 15px rgba(255, 255, 255, 0.4)); }
-        .hidden { display: none; }
+        .gradient-icon { filter: drop-shadow(0 0 20px rgba(255, 255, 255, 0.5)); }
+        .hidden { display: none !important; }
+        
+        /* Animasi Flash Pas Cekrek */
+        @keyframes flash { 0% { opacity: 1; } 100% { opacity: 0; } }
+        .flash-effect { position: fixed; inset: 0; background: white; z-index: 50; animation: flash 0.3s ease-out; pointer-events: none; opacity: 0; }
     </style>
 </head>
 <body class="min-h-screen flex flex-col items-center justify-center p-4 text-center">
     <div class="cyber-grid"></div>
+    <div id="flash-screen" class="flash-effect"></div>
 
-    <div class="mb-10 flex flex-col items-center">
-        <img src="https://raw.githubusercontent.com/umartaufik15m/Absensi-Calsub/refs/heads/main/gradient.png" class="w-16 gradient-icon mb-4">
-        <h1 class="text-2xl font-black italic tracking-widest">CALSUB<span class="text-gray-500">.ID</span></h1>
+    <div class="mb-12 flex flex-col items-center">
+        <img src="https://raw.githubusercontent.com/umartaufik15m/Absensi-Calsub/refs/heads/main/gradient.png" class="w-32 gradient-icon mb-4">
     </div>
 
     <div id="app" class="glass-card p-8 rounded-[2.5rem] w-full max-w-sm shadow-2xl">
         
         <div id="view-login">
-            <h2 class="text-[10px] font-bold tracking-[0.4em] mb-8 text-gray-500 uppercase">Verifikasi Identitas</h2>
+            <h2 class="text-[10px] font-bold tracking-[0.4em] mb-8 text-gray-500 uppercase">Input PIN</h2>
             <div class="space-y-4 mb-6">
-                <input type="text" id="emp-id" placeholder="ID PEGAWAI" class="w-full p-5 bg-white/5 border border-white/10 rounded-2xl text-center focus:border-white/40 outline-none uppercase font-bold">
-                <input type="password" id="emp-pin" placeholder="PIN" class="w-full p-5 bg-white/5 border border-white/10 rounded-2xl text-center tracking-[1em] focus:border-white/40 outline-none">
+                <input type="text" id="emp-id" placeholder="ID PEGAWAI" class="w-full p-5 bg-white/5 border border-white/10 rounded-2xl text-center focus:border-white/40 outline-none uppercase font-bold text-lg">
+                <input type="password" id="emp-pin" placeholder="PIN" class="w-full p-5 bg-white/5 border border-white/10 rounded-2xl text-center tracking-[1em] focus:border-white/40 outline-none text-lg">
             </div>
-            <button onclick="handleLogin()" class="w-full bg-white text-black font-black py-5 rounded-2xl active:scale-95 transition-all shadow-xl">MASUK</button>
+            <button onclick="handleLogin()" class="w-full bg-white text-black font-black py-5 rounded-2xl active:scale-95 transition-all shadow-xl text-lg">MASUK</button>
         </div>
 
         <div id="view-profile" class="hidden">
-            <div class="w-20 h-20 bg-white/5 rounded-full mx-auto mb-4 border border-white/10 flex items-center justify-center">
+            <div class="w-20 h-20 bg-white/5 rounded-full mx-auto mb-4 border border-white/10 flex items-center justify-center shadow-inner">
                 <span class="text-3xl">👤</span>
             </div>
-            <h2 id="prof-name" class="text-2xl font-black italic mb-1 uppercase">NAMA</h2>
-            <p id="prof-dept" class="text-[10px] text-gray-500 tracking-widest font-bold mb-8 uppercase">BAGIAN</p>
-            <button onclick="changeView('view-camera')" class="w-full border-2 border-white text-white font-black py-5 rounded-2xl active:scale-95 transition-all">MULAI ABSENSI</button>
+            <h2 id="prof-name" class="text-2xl font-black italic mb-1 uppercase tracking-tight">NAMA</h2>
+            <p id="prof-dept" class="text-[10px] text-gray-500 tracking-widest font-bold mb-10 uppercase">BAGIAN</p>
+            <button onclick="changeView('view-camera')" class="w-full border-2 border-white text-white font-black py-5 rounded-2xl active:scale-95 transition-all text-lg hover:bg-white hover:text-black">ABSEN MASUK</button>
         </div>
 
         <div id="view-camera" class="hidden">
-            <h2 class="text-lg font-bold mb-4">Verifikasi Wajah</h2>
-            <div class="relative rounded-[2rem] overflow-hidden mb-6 h-64 bg-black border border-white/20">
+            <h2 class="text-lg font-bold mb-5 tracking-tight">Ambil Foto Wajah</h2>
+            <div class="relative rounded-[2rem] overflow-hidden mb-6 h-64 bg-black border border-white/10 shadow-inner">
                 <video id="video" class="w-full h-full object-cover" autoplay playsinline></video>
+                
+                <canvas id="canvas" class="hidden"></canvas>
+                
+                <img id="photo-preview" class="hidden w-full h-full object-cover">
+
                 <div class="absolute inset-0 border-[6px] border-white/5 pointer-events-none rounded-[2rem]"></div>
             </div>
-            <button onclick="submitCheckIn()" class="w-full bg-green-500 text-white font-black py-5 rounded-2xl shadow-lg active:scale-95 transition-all">KIRIM ABSEN MASUK</button>
+
+            <button id="btn-capture" onclick="takePhoto()" class="w-full bg-white text-black font-black py-5 rounded-2xl active:scale-95 transition-all text-lg flex items-center justify-center space-x-2">
+                <span class="text-2xl">📸</span> <span>AMBIL FOTO (CEKREK)</span>
+            </button>
+
+            <div id="camera-actions" class="hidden space-y-3">
+                <button onclick="submitCheckIn()" class="w-full bg-green-500 text-white font-black py-5 rounded-2xl shadow-lg active:scale-95 transition-all text-lg">KIRIM FOTO & ABSEN</button>
+                <button onclick="retakePhoto()" class="w-full border border-white/10 text-gray-500 font-bold py-3 rounded-2xl active:scale-95 transition-all text-xs">ULANG FOTO</button>
+            </div>
         </div>
 
         <div id="view-dashboard" class="hidden text-left">
             <div class="text-center mb-6">
-                <div class="inline-block px-3 py-1 bg-green-500/20 text-green-400 rounded-full text-[9px] font-bold tracking-widest uppercase mb-2">Status: Bekerja</div>
-                <h2 class="text-xl font-black italic uppercase">Selamat Bekerja!</h2>
+                <div class="inline-block px-3 py-1 bg-green-500/20 text-green-400 rounded-full text-[9px] font-bold tracking-widest uppercase mb-2 border border-green-500/30">Status: Bekerja</div>
+                <h2 class="text-2xl font-black italic uppercase tracking-tight">Ayo Beraksi!</h2>
             </div>
             
             <div class="bg-white/5 rounded-3xl p-5 mb-8 border border-white/5">
-                <p class="text-[10px] font-bold text-gray-500 mb-4 tracking-widest uppercase">💡 Tips Hari Ini:</p>
+                <p class="text-[10px] font-bold text-gray-500 mb-4 tracking-widest uppercase">💡 Tips Produksi:</p>
                 <ul class="text-[11px] space-y-3 text-gray-300 italic">
-                    <li>• Membaca doa sebelum mulai.</li>
-                    <li>• Fokus & teliti pada tiap detail press.</li>
-                    <li>• Jaga kebersihan mesin & area kerja.</li>
-                    <li>• Tanya leader jika ada kendala.</li>
+                    <li>• Doa dulu biar hasil press mantap.</li>
+                    <li>• Teliti suhu press, jangan sampe gosong.</li>
+                    <li>• Jaga kebersihan film & kaos.</li>
+                    <li>• Kendala teknis? Hubungi Leader.</li>
                 </ul>
             </div>
 
-            <button onclick="changeView('view-checkout')" class="w-full border border-white/10 text-gray-500 font-bold py-5 rounded-2xl hover:text-red-500 transition-all">ABSEN PULANG</button>
+            <button onclick="changeView('view-checkout')" class="w-full border border-white/10 text-gray-500 font-bold py-5 rounded-2xl hover:text-red-500 transition-all text-lg hover:border-red-500/30">ABSEN PULANG</button>
         </div>
 
         <div id="view-checkout" class="hidden">
-            <h2 class="text-xl font-black italic mb-6 uppercase">Hasil Produksi</h2>
+            <h2 class="text-xl font-black italic mb-6 uppercase tracking-wider">Laporan Akhir</h2>
             <div class="space-y-4 mb-8">
-                <input type="number" id="prod-total" placeholder="TOTAL PCS" class="w-full p-5 bg-white/5 border border-white/10 rounded-2xl text-center text-3xl font-black outline-none">
-                <label class="flex items-center justify-center space-x-3 cursor-pointer p-4 bg-white/5 rounded-2xl border border-white/5">
-                    <input type="checkbox" id="is-ot" class="w-5 h-5 accent-white">
-                    <span class="text-sm font-medium">Lembur</span>
+                <div class="text-left">
+                    <label class="text-[10px] text-gray-600 ml-4 font-bold uppercase tracking-widest">Total Press (Pcs)</label>
+                    <input type="number" id="prod-total" placeholder="00" class="w-full p-5 bg-white/5 border border-white/10 rounded-2xl text-center text-4xl font-black outline-none focus:border-white/40">
+                </div>
+                <label class="flex items-center justify-center space-x-3 cursor-pointer p-4 bg-white/5 rounded-2xl border border-white/5 hover:border-white/20">
+                    <input type="checkbox" id="is-ot" class="w-6 h-6 accent-white bg-black border-white/10 rounded-lg">
+                    <span class="text-base font-medium">Lembur</span>
                 </label>
             </div>
-            <button onclick="submitCheckOut()" class="w-full bg-white text-black font-black py-5 rounded-2xl shadow-xl active:scale-95 transition-all">SIMPAN & PULANG</button>
+            <button onclick="submitCheckOut()" class="w-full bg-white text-black font-black py-5 rounded-2xl shadow-xl active:scale-95 transition-all text-lg">SIMPAN & PULANG</button>
         </div>
 
         <div id="view-thanks" class="hidden py-10">
-            <div class="text-5xl mb-6">🙌</div>
-            <h2 class="text-2xl font-black italic mb-2 uppercase tracking-wide">Terima Kasih!</h2>
-            <p class="text-gray-500 text-sm">Data laporan sudah masuk.<br>Hati-hati di jalan pulang!</p>
-            <button onclick="location.reload()" class="mt-10 text-[10px] text-gray-700 font-bold uppercase underline">Log Out</button>
+            <div class="text-6xl mb-6">🙌</div>
+            <h2 class="text-3xl font-black italic mb-2 uppercase tracking-tight">Terima Kasih!</h2>
+            <p class="text-gray-500 text-sm">Laporan sudah kami terima.<br>Hati-hati di jalan pulang!</p>
+            <button onclick="location.reload()" class="mt-12 text-[10px] text-gray-700 font-bold uppercase underline tracking-widest hover:text-gray-400">Log Out</button>
         </div>
 
-        <p id="notif" class="mt-6 text-center text-[10px] font-bold tracking-widest text-gray-600"></p>
+        <p id="notif" class="mt-6 text-center text-[10px] font-bold tracking-widest text-gray-600 h-4"></p>
     </div>
 
     <script>
+        // INTEGRASI SUPABASE LU
         const SB_URL = 'https://wcjzperckywcskcrhgrv.supabase.co';
         const SB_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6IndjanpwZXJja3l3Y3NrY3JoZ3J2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzU5OTk4NTksImV4cCI6MjA5MTU3NTg1OX0.0q60Bs-L3E_EWu5pg4y6GeW7jajHmEcIgdgbBjqgHQs';
-        const supabaseClient = supabase.createClient(SB_URL, SB_KEY);
+        const supabase = supabase.createClient(SB_URL, SB_KEY);
 
-        const WORK_LOC = { lat: -6.2510688, lng: 107.0253873 };
         let activeUser = null;
+        let capturedPhotoBlob = null; // Buat simpan file foto sementara
 
         function changeView(viewId) {
             document.querySelectorAll('#app > div').forEach(div => div.classList.add('hidden'));
@@ -117,10 +138,12 @@
         async function handleLogin() {
             const id = document.getElementById('emp-id').value;
             const pin = document.getElementById('emp-pin').value;
-            const { data, error } = await supabaseClient.from('profiles').select('*').eq('employee_id', id).eq('pin', pin).single();
+            if(!id || !pin) return alert("Isi ID & PIN!");
+
+            const { data, error } = await supabase.from('profiles').select('*').eq('employee_id', id).eq('pin', pin).single();
 
             if (error || !data) {
-                alert("ID ATAU PIN SALAH!");
+                alert("ID atau PIN SALAH!");
                 return;
             }
 
@@ -130,42 +153,123 @@
             changeView('view-profile');
         }
 
+        // --- LOGIKA KAMERA BARU (CEKREK) ---
+        let streamObj = null;
+
         async function startCam() {
+            // Reset UI Kamera
+            document.getElementById('video').classList.remove('hidden');
+            document.getElementById('photo-preview').classList.add('hidden');
+            document.getElementById('btn-capture').classList.remove('hidden');
+            document.getElementById('camera-actions').classList.add('hidden');
+            capturedPhotoBlob = null;
+
             try {
-                const stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: "user" } });
-                document.getElementById('video').srcObject = stream;
+                streamObj = await navigator.mediaDevices.getUserMedia({ video: { facingMode: "user" }, audio: false });
+                document.getElementById('video').srcObject = streamObj;
             } catch (err) {
-                alert("IZINKAN KAMERA UNTUK LANJUT");
+                alert("Gagal akses kamera. Pastikan izin diberikan.");
+                changeView('view-profile');
             }
         }
 
-        async function submitCheckIn() {
-            document.getElementById('notif').innerText = "PROSES DATA...";
-            navigator.geolocation.getCurrentPosition(async (pos) => {
-                const { error } = await supabaseClient.from('attendance').insert([{
-                    employee_id: activeUser.employee_id,
-                    employee_name: activeUser.name,
-                    status: 'masuk',
-                    location: `${pos.coords.latitude},${pos.coords.longitude}`
-                }]);
+        function takePhoto() {
+            const video = document.getElementById('video');
+            const canvas = document.getElementById('canvas');
+            const preview = document.getElementById('photo-preview');
+            const flash = document.getElementById('flash-screen');
 
-                if (!error) {
-                    alert("Absen Masuk Diterima! (Mode Test)");
-                    changeView('view-dashboard');
-                    document.getElementById('notif').innerText = "";
-                }
+            // Efek Flash
+            flash.style.opacity = '1';
+            setTimeout(() => flash.style.opacity = '0', 100);
+
+            // Set ukuran canvas sama kayak video
+            canvas.width = video.videoWidth;
+            canvas.height = video.videoHeight;
+
+            // Gambar video ke canvas (Cekrek!)
+            canvas.getContext('2d').drawImage(video, 0, 0, canvas.width, canvas.height);
+
+            // Ubah canvas jadi file Blob (JPEG kualitas 0.8 biar enteng)
+            canvas.toBlob((blob) => {
+                capturedPhotoBlob = blob;
+                // Tampilin hasil foto ke kotak preview
+                preview.src = URL.createObjectURL(blob);
+                
+                // Tukar UI: Matikan video, tampilin foto diam, tampilin tombol kirim
+                video.classList.add('hidden');
+                preview.classList.remove('hidden');
+                document.getElementById('btn-capture').classList.add('hidden');
+                document.getElementById('camera-actions').classList.remove('hidden');
+                
+                // Matikan stream kamera biar hemat batre
+                if(streamObj) streamObj.getTracks().forEach(track => track.stop());
+            }, 'image/jpeg', 0.8);
+        }
+
+        function retakePhoto() {
+            startCam(); // Balik ke mode live video
+        }
+        // ----------------------------------
+
+        async function submitCheckIn() {
+            if(!capturedPhotoBlob) return alert("Ambil foto dulu bos!");
+            
+            const notif = document.getElementById('notif');
+            notif.innerText = "MENGUNGGAH FOTO & ABSEN...";
+            
+            // 1. Upload Foto ke Supabase Storage (Bucket 'photos')
+            const fileName = `${activeUser.employee_id}_${Date.now()}.jpg`;
+            const { data: uploadData, error: uploadError } = await supabase.storage
+                .from('photos')
+                .upload(fileName, capturedPhotoBlob, { contentType: 'image/jpeg' });
+
+            if (uploadError) {
+                console.error(uploadError);
+                showMessage("GAGAL UPLOAD FOTO! Cek Bucket 'photos' di Supabase.", true);
+                return;
+            }
+
+            // Dapet link publik fotonya
+            const { data: urlData } = supabase.storage.from('photos').getPublicUrl(fileName);
+            const publicPhotoUrl = urlData.publicUrl;
+
+            // 2. Ambil GPS (Mode Test - Lanjut terus walau eror)
+            showMessage("MEMPROSES LOKASI...");
+            navigator.geolocation.getCurrentPosition(async (pos) => {
+                completeAbsenIn(pos.coords.latitude, pos.coords.longitude, publicPhotoUrl);
             }, (err) => {
-                alert("GPS Gagal, tapi tetap diproses (Mode Test)");
+                // GPS Gagal (Mode Test)
+                completeAbsenIn(0, 0, publicPhotoUrl);
+            }, { timeout: 5000 });
+        }
+
+        async function completeAbsenIn(lat, lng, photoUrl) {
+            const { error } = await supabase.from('attendance').insert([{
+                employee_id: activeUser.employee_id,
+                employee_name: activeUser.name,
+                status: 'masuk',
+                location: `${lat},${lng}`,
+                photo_url: photoUrl // Simpan link fotonya di tabel
+            }]);
+
+            if (!error) {
+                alert("Absen Masuk Berhasil! Selamat Bekerja.");
                 changeView('view-dashboard');
-            });
+                document.getElementById('notif').innerText = "";
+            } else {
+                showMessage("GAGAL SIMPAN ABSEN!", true);
+            }
         }
 
         async function submitCheckOut() {
             const prod = document.getElementById('prod-total').value;
             const isOT = document.getElementById('is-ot').checked;
-            if(!prod) return alert("INPUT HASIL KERJA!");
+            if(!prod) return alert("INPUT HASIL KERJA PCS!");
 
-            const { error } = await supabaseClient.from('attendance').insert([{
+            showMessage("MENYIMPAN LAPORAN...");
+
+            const { error } = await supabase.from('attendance').insert([{
                 employee_id: activeUser.employee_id,
                 employee_name: activeUser.name,
                 status: 'pulang',
@@ -173,7 +277,18 @@
                 is_overtime: isOT
             }]);
 
-            if (!error) changeView('view-thanks');
+            if (!error) {
+                changeView('view-thanks');
+                document.getElementById('notif').innerText = "";
+            } else {
+                showMessage("GAGAL SIMPAN LAPORAN!", true);
+            }
+        }
+
+        function showMessage(text, isError = false) {
+            const msgEl = document.getElementById('notif');
+            msgEl.innerText = text;
+            msgEl.className = `mt-6 text-center text-[10px] font-bold tracking-widest ${isError ? 'text-red-500' : 'text-gray-600'}`;
         }
     </script>
 </body>
