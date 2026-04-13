@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Calsub Admin Dashboard</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;700;900&display=swap" rel="stylesheet">
+    
+    <style>
+        body { font-family: 'Poppins', sans-serif; background-color: #0f172a; color: white; }
+        .glass { background: rgba(255, 255, 255, 0.05); backdrop-filter: blur(10px); border: 1px solid rgba(255, 255, 255, 0.1); }
+    </style>
+</head>
+<body class="p-4 md:p-8">
+
+    <div id="login-admin" class="min-h-screen flex items-center justify-center">
+        <div class="glass p-8 rounded-3xl w-full max-w-sm text-center">
+            <h2 class="text-2xl font-black mb-6">LOGIN BOSS</h2>
+            <input type="password" id="admin-pin" placeholder="PIN ADMIN" class="w-full p-4 bg-black/50 rounded-xl mb-4 text-center tracking-widest text-xl outline-none">
+            <button onclick="cekAdmin()" class="w-full bg-white text-black font-bold py-4 rounded-xl hover:bg-gray-200">MASUK DASHBOARD</button>
+        </div>
+    </div>
+
+    <div id="dashboard" class="hidden max-w-6xl mx-auto">
+        <header class="flex justify-between items-center mb-8 border-b border-white/10 pb-4">
+            <div>
+                <h1 class="text-3xl font-black italic tracking-widest">CALSUB<span class="text-gray-500">.ID</span></h1>
+                <p class="text-sm text-gray-400">Owner Dashboard - Live Data</p>
+            </div>
+            <button onclick="loadData()" class="bg-blue-600 px-4 py-2 rounded-lg font-bold text-sm hover:bg-blue-500">🔄 REFRESH DATA</button>
+        </header>
+
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+            <div class="glass p-6 rounded-2xl">
+                <p class="text-gray-400 text-sm font-bold mb-1">TOTAL HADIR HARI INI</p>
+                <h3 id="tot-hadir" class="text-4xl font-black text-green-400">0</h3>
+            </div>
+            <div class="glass p-6 rounded-2xl">
+                <p class="text-gray-400 text-sm font-bold mb-1">TOTAL PRODUKSI (PCS)</p>
+                <h3 id="tot-prod" class="text-4xl font-black text-blue-400">0</h3>
+            </div>
+            <div class="glass p-6 rounded-2xl">
+                <p class="text-gray-400 text-sm font-bold mb-1">KARYAWAN LEMBUR</p>
+                <h3 id="tot-lembur" class="text-4xl font-black text-orange-400">0</h3>
+            </div>
+        </div>
+
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            <div class="glass p-6 rounded-2xl">
+                <h3 class="font-bold mb-4 text-gray-300">Grafik Produksi per Orang</h3>
+                <canvas id="myChart"></canvas>
+            </div>
+
+            <div class="glass p-6 rounded-2xl overflow-x-auto">
+                <h3 class="font-bold mb-4 text-gray-300">Aktivitas Terbaru</h3>
+                <table class="w-full text-left text-sm">
+                    <thead>
+                        <tr class="border-b border-white/10 text-gray-400">
+                            <th class="pb-3">Nama</th>
+                            <th class="pb-3">Status</th>
+                            <th class="pb-3">Hasil</th>
+                            <th class="pb-3">Foto</th>
+                        </tr>
+                    </thead>
+                    <tbody id="table-body">
+                        </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // KONEKSI SUPABASE LU
+        const SB_URL = 'https://wcjzperckywcskcrhgrv.supabase.co';
+        const SB_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6IndjanpwZXJja3l3Y3NrY3JoZ3J2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzU5OTk4NTksImV4cCI6MjA5MTU3NTg1OX0.0q60Bs-L3E_EWu5pg4y6GeW7jajHmEcIgdgbBjqgHQs';
+        const supabase = supabase.createClient(SB_URL, SB_KEY);
+        let myChartInstance = null;
+
+        // BIKIN PASSWORD SEDERHANA BUAT ADMIN
+        function cekAdmin() {
+            const pin = document.getElementById('admin-pin').value;
+            if(pin === '8899') { // <-- INI PASSWORD ADMIN LU (8899)
+                document.getElementById('login-admin').classList.add('hidden');
+                document.getElementById('dashboard').classList.remove('hidden');
+                loadData();
+            } else {
+                alert("PIN BOSS SALAH!");
+            }
+        }
+
+        async function loadData() {
+            // Ambil tanggal hari ini buat filter
+            const today = new Date().toISOString().split('T')[0];
+
+            // Tarik data absen dari Supabase
+            const { data, error } = await supabase
+                .from('attendance')
+                .select('*')
+                .gte('check_in', today + 'T00:00:00Z') // Hanya data hari ini
+                .order('check_in', { ascending: false });
+
+            if(error) return alert("Gagal narik data!");
+
+            let totalHadir = 0;
+            let totalProduksi = 0;
+            let totalLembur = 0;
+            let names = [];
+            let productions = [];
+            let tableHTML = '';
+
+            data.forEach(row => {
+                // Hitung-hitungan Kartu Atas
+                totalHadir++;
+                totalProduksi += row.production_total || 0;
+                if(row.is_overtime) totalLembur++;
+
+                // Siapin data buat Grafik
+                names.push(row.employee_name);
+                productions.push(row.production_total || 0);
+
+                // Siapin data buat Tabel
+                let badgeColor = row.status === 'selesai' ? 'bg-green-500/20 text-green-400' : 'bg-yellow-500/20 text-yellow-400';
+                let photoLink = row.photo_url ? `<a href="${row.photo_url}" target="_blank" class="text-blue-400 underline">Lihat</a>` : '-';
+                
+                tableHTML += `
+                    <tr class="border-b border-white/5">
+                        <td class="py-3 font-bold">${row.employee_name}</td>
+                        <td class="py-3"><span class="px-2 py-1 rounded text-xs ${badgeColor} uppercase">${row.status}</span></td>
+                        <td class="py-3 font-black text-blue-300">${row.production_total || 0}</td>
+                        <td class="py-3">${photoLink}</td>
+                    </tr>
+                `;
+            });
+
+            // Tembakin angka ke HTML
+            document.getElementById('tot-hadir').innerText = totalHadir;
+            document.getElementById('tot-prod').innerText = totalProduksi;
+            document.getElementById('tot-lembur').innerText = totalLembur;
+            document.getElementById('table-body').innerHTML = tableHTML;
+
+            // Bikin / Update Grafik
+            drawChart(names, productions);
+        }
+
+        function drawChart(labels, data) {
+            const ctx = document.getElementById('myChart').getContext('2d');
+            
+            // Kalo grafik udah ada, hapus dulu biar gak numpuk pas di refresh
+            if(myChartInstance) myChartInstance.destroy();
+
+            myChartInstance = new Chart(ctx, {
+                type: 'bar', // Jenis grafik batang
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        label: 'Hasil Press (Pcs)',
+                        data: data,
+                        backgroundColor: '#3b82f6', // Warna biru Tailwind
+                        borderRadius: 8
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    plugins: { legend: { display: false } },
+                    scales: { 
+                        y: { beginAtZero: true, grid: { color: 'rgba(255,255,255,0.1)' } },
+                        x: { grid: { display: false } }
+                    }
+                }
+            });
+        }
+    </script>
+</body>
+</html>
