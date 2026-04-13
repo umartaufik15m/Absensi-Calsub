@@ -20,8 +20,6 @@
         .glass-card { background: rgba(15, 15, 15, 0.8); backdrop-filter: blur(20px); border: 1px solid rgba(255, 255, 255, 0.1); }
         .gradient-icon { filter: drop-shadow(0 0 20px rgba(255, 255, 255, 0.5)); }
         .hidden { display: none !important; }
-        
-        /* Animasi Flash Pas Cekrek */
         @keyframes flash { 0% { opacity: 1; } 100% { opacity: 0; } }
         .flash-effect { position: fixed; inset: 0; background: white; z-index: 50; animation: flash 0.3s ease-out; pointer-events: none; opacity: 0; }
     </style>
@@ -30,69 +28,64 @@
     <div class="cyber-grid"></div>
     <div id="flash-screen" class="flash-effect"></div>
 
-    <div class="mb-12 flex flex-col items-center">
-        <img src="https://raw.githubusercontent.com/umartaufik15m/Absensi-Calsub/refs/heads/main/gradient.png" class="w-32 gradient-icon mb-4">
+    <div class="mb-10 flex flex-col items-center">
+        <img src="https://raw.githubusercontent.com/umartaufik15m/Absensi-Calsub/refs/heads/main/gradient.png" class="w-24 gradient-icon mb-2">
     </div>
 
-    <div id="app" class="glass-card p-8 rounded-[2.5rem] w-full max-w-sm shadow-2xl">
+    <div id="app" class="glass-card p-8 rounded-[2.5rem] w-full max-w-sm shadow-2xl relative">
         
         <div id="view-login">
-            <h2 class="text-[10px] font-bold tracking-[0.4em] mb-8 text-gray-500 uppercase">Input PIN</h2>
+            <h2 class="text-[10px] font-bold tracking-[0.4em] mb-8 text-gray-500 uppercase">Input Identitas</h2>
             <div class="space-y-4 mb-6">
                 <input type="text" id="emp-id" placeholder="ID PEGAWAI" class="w-full p-5 bg-white/5 border border-white/10 rounded-2xl text-center focus:border-white/40 outline-none uppercase font-bold text-lg">
                 <input type="password" id="emp-pin" placeholder="PIN" class="w-full p-5 bg-white/5 border border-white/10 rounded-2xl text-center tracking-[1em] focus:border-white/40 outline-none text-lg">
             </div>
-            <button onclick="handleLogin()" class="w-full bg-white text-black font-black py-5 rounded-2xl active:scale-95 transition-all shadow-xl text-lg">MASUK</button>
+            <button onclick="handleLogin()" class="w-full bg-white text-black font-black py-5 rounded-2xl active:scale-95 transition-all text-lg shadow-[0_0_20px_rgba(255,255,255,0.2)]">MASUK SISTEM</button>
         </div>
 
         <div id="view-profile" class="hidden">
-            <div class="w-20 h-20 bg-white/5 rounded-full mx-auto mb-4 border border-white/10 flex items-center justify-center shadow-inner">
-                <span class="text-3xl">👤</span>
-            </div>
+            <div class="w-20 h-20 bg-white/5 rounded-full mx-auto mb-4 border border-white/10 flex items-center justify-center shadow-inner text-3xl">👤</div>
             <h2 id="prof-name" class="text-2xl font-black italic mb-1 uppercase tracking-tight">NAMA</h2>
-            <p id="prof-dept" class="text-[10px] text-gray-500 tracking-widest font-bold mb-10 uppercase">BAGIAN</p>
-            <button onclick="changeView('view-camera')" class="w-full border-2 border-white text-white font-black py-5 rounded-2xl active:scale-95 transition-all text-lg hover:bg-white hover:text-black">ABSEN MASUK</button>
+            <p id="prof-dept" class="text-[10px] text-gray-500 tracking-widest font-bold mb-8 uppercase">BAGIAN</p>
+            
+            <div class="space-y-3">
+                <button onclick="openCamera('masuk')" class="w-full border-2 border-white text-white font-black py-4 rounded-2xl active:scale-95 transition-all text-lg hover:bg-white hover:text-black">ABSEN MASUK</button>
+                <button onclick="submitIzin()" class="w-full border border-white/10 text-orange-400 font-bold py-3 rounded-2xl active:scale-95 transition-all text-sm bg-orange-400/5">LAPOR SAKIT / IZIN</button>
+            </div>
         </div>
 
         <div id="view-camera" class="hidden">
-            <h2 class="text-lg font-bold mb-5 tracking-tight">Ambil Foto Wajah</h2>
+            <h2 id="cam-title" class="text-lg font-bold mb-5 tracking-tight">Verifikasi Wajah</h2>
             <div class="relative rounded-[2rem] overflow-hidden mb-6 h-64 bg-black border border-white/10 shadow-inner">
                 <video id="video" class="w-full h-full object-cover" autoplay playsinline></video>
-                
                 <canvas id="canvas" class="hidden"></canvas>
-                
                 <img id="photo-preview" class="hidden w-full h-full object-cover">
-
                 <div class="absolute inset-0 border-[6px] border-white/5 pointer-events-none rounded-[2rem]"></div>
             </div>
 
-            <button id="btn-capture" onclick="takePhoto()" class="w-full bg-white text-black font-black py-5 rounded-2xl active:scale-95 transition-all text-lg flex items-center justify-center space-x-2">
-                <span class="text-2xl">📸</span> <span>AMBIL FOTO (CEKREK)</span>
-            </button>
+            <button id="btn-capture" onclick="takePhoto()" class="w-full bg-white text-black font-black py-5 rounded-2xl active:scale-95 transition-all text-lg">📸 CEKREK</button>
 
             <div id="camera-actions" class="hidden space-y-3">
-                <button onclick="submitCheckIn()" class="w-full bg-green-500 text-white font-black py-5 rounded-2xl shadow-lg active:scale-95 transition-all text-lg">KIRIM FOTO & ABSEN</button>
-                <button onclick="retakePhoto()" class="w-full border border-white/10 text-gray-500 font-bold py-3 rounded-2xl active:scale-95 transition-all text-xs">ULANG FOTO</button>
+                <button onclick="processPhoto()" class="w-full bg-green-500 text-white font-black py-4 rounded-2xl shadow-lg active:scale-95 transition-all text-lg">LANJUTKAN</button>
+                <button onclick="startCam()" class="w-full border border-white/10 text-gray-500 font-bold py-3 rounded-2xl active:scale-95 transition-all text-xs">ULANG FOTO</button>
             </div>
         </div>
 
         <div id="view-dashboard" class="hidden text-left">
             <div class="text-center mb-6">
-                <div class="inline-block px-3 py-1 bg-green-500/20 text-green-400 rounded-full text-[9px] font-bold tracking-widest uppercase mb-2 border border-green-500/30">Status: Bekerja</div>
+                <div id="status-badge" class="inline-block px-3 py-1 bg-green-500/20 text-green-400 rounded-full text-[9px] font-bold tracking-widest uppercase mb-2 border border-green-500/30">Status: Bekerja</div>
                 <h2 class="text-2xl font-black italic uppercase tracking-tight">Ayo Beraksi!</h2>
             </div>
             
             <div class="bg-white/5 rounded-3xl p-5 mb-8 border border-white/5">
                 <p class="text-[10px] font-bold text-gray-500 mb-4 tracking-widest uppercase">💡 Tips Produksi:</p>
                 <ul class="text-[11px] space-y-3 text-gray-300 italic">
-                    <li>• Doa dulu biar hasil press mantap.</li>
-                    <li>• Teliti suhu press, jangan sampe gosong.</li>
-                    <li>• Jaga kebersihan film & kaos.</li>
-                    <li>• Kendala teknis? Hubungi Leader.</li>
+                    <li>• Baca Bismillah sebelum press.</li>
+                    <li>• Cek suhu & tekanan mesin.</li>
+                    <li>• Hasil press berbayang? Lapor leader!</li>
                 </ul>
             </div>
-
-            <button onclick="changeView('view-checkout')" class="w-full border border-white/10 text-gray-500 font-bold py-5 rounded-2xl hover:text-red-500 transition-all text-lg hover:border-red-500/30">ABSEN PULANG</button>
+            <button onclick="openCamera('pulang')" class="w-full border border-red-500/50 text-red-400 font-bold py-5 rounded-2xl hover:bg-red-500/10 transition-all text-lg">ABSEN PULANG</button>
         </div>
 
         <div id="view-checkout" class="hidden">
@@ -102,37 +95,43 @@
                     <label class="text-[10px] text-gray-600 ml-4 font-bold uppercase tracking-widest">Total Press (Pcs)</label>
                     <input type="number" id="prod-total" placeholder="00" class="w-full p-5 bg-white/5 border border-white/10 rounded-2xl text-center text-4xl font-black outline-none focus:border-white/40">
                 </div>
-                <label class="flex items-center justify-center space-x-3 cursor-pointer p-4 bg-white/5 rounded-2xl border border-white/5 hover:border-white/20">
+                <label class="flex items-center justify-center space-x-3 cursor-pointer p-4 bg-white/5 rounded-2xl border border-white/5">
                     <input type="checkbox" id="is-ot" class="w-6 h-6 accent-white bg-black border-white/10 rounded-lg">
-                    <span class="text-base font-medium">Lembur</span>
+                    <span class="text-base font-medium">Saya Lembur</span>
                 </label>
             </div>
-            <button onclick="submitCheckOut()" class="w-full bg-white text-black font-black py-5 rounded-2xl shadow-xl active:scale-95 transition-all text-lg">SIMPAN & PULANG</button>
+            <button onclick="submitCheckOutFinal()" class="w-full bg-white text-black font-black py-5 rounded-2xl shadow-xl active:scale-95 transition-all text-lg">SIMPAN & SELESAI</button>
         </div>
 
-        <div id="view-thanks" class="hidden py-10">
+        <div id="view-thanks" class="hidden py-10 text-center">
             <div class="text-6xl mb-6">🙌</div>
-            <h2 class="text-3xl font-black italic mb-2 uppercase tracking-tight">Terima Kasih!</h2>
-            <p class="text-gray-500 text-sm">Laporan sudah kami terima.<br>Hati-hati di jalan pulang!</p>
-            <button onclick="location.reload()" class="mt-12 text-[10px] text-gray-700 font-bold uppercase underline tracking-widest hover:text-gray-400">Log Out</button>
+            <h2 class="text-3xl font-black italic mb-2 uppercase tracking-tight">Mantap!</h2>
+            <p class="text-gray-500 text-sm">Datamu udah aman di database.<br>Selamat istirahat!</p>
+            <button onclick="location.reload()" class="mt-12 text-[10px] text-gray-700 font-bold uppercase underline tracking-widest">Log Out</button>
         </div>
 
         <p id="notif" class="mt-6 text-center text-[10px] font-bold tracking-widest text-gray-600 h-4"></p>
     </div>
 
     <script>
-        // INTEGRASI SUPABASE (UDAH DI-FIX BENTROKNYA)
+        // KONEKSI SUPABASE
         const SB_URL = 'https://wcjzperckywcskcrhgrv.supabase.co';
         const SB_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6IndjanpwZXJja3l3Y3NrY3JoZ3J2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzU5OTk4NTksImV4cCI6MjA5MTU3NTg1OX0.0q60Bs-L3E_EWu5pg4y6GeW7jajHmEcIgdgbBjqgHQs';
         const supabaseClient = supabase.createClient(SB_URL, SB_KEY);
 
         let activeUser = null;
         let capturedPhotoBlob = null; 
+        let cameraMode = 'masuk'; // bisa 'masuk' atau 'pulang'
 
         function changeView(viewId) {
             document.querySelectorAll('#app > div').forEach(div => div.classList.add('hidden'));
             document.getElementById(viewId).classList.remove('hidden');
-            if(viewId === 'view-camera') startCam();
+        }
+
+        function showMessage(text, isError = false) {
+            const msgEl = document.getElementById('notif');
+            msgEl.innerText = text;
+            msgEl.className = `mt-6 text-center text-[10px] font-bold tracking-widest ${isError ? 'text-red-500' : 'text-gray-400'}`;
         }
 
         async function handleLogin() {
@@ -143,32 +142,54 @@
             try {
                 const id = document.getElementById('emp-id').value.trim();
                 const pin = document.getElementById('emp-pin').value.trim();
-                if(!id || !pin) {
-                    btn.innerText = originalText;
-                    return alert("Isi ID & PIN!");
-                }
+                if(!id || !pin) { btn.innerText = originalText; return alert("Isi ID & PIN!"); }
 
                 const { data, error } = await supabaseClient.from('profiles').select('*').eq('employee_id', id).eq('pin', pin).single();
 
-                if (error || !data) {
-                    btn.innerText = originalText;
-                    alert("ID atau PIN SALAH!");
-                    return;
-                }
+                if (error || !data) { btn.innerText = originalText; return alert("ID atau PIN SALAH!"); }
 
                 activeUser = data;
                 document.getElementById('prof-name').innerText = data.name;
                 document.getElementById('prof-dept').innerText = data.department;
                 changeView('view-profile');
-                btn.innerText = originalText;
             } catch (err) {
+                alert("Error: " + err.message);
+            } finally {
                 btn.innerText = originalText;
-                alert("Error sistem: " + err.message);
             }
         }
 
-        // --- LOGIKA KAMERA ---
+        // FITUR SAKIT/IZIN
+        async function submitIzin() {
+            const alasan = prompt("Tulis alasan Izin/Sakit hari ini:");
+            if(!alasan) return;
+
+            showMessage("MENGIRIM IZIN...");
+            const { error } = await supabaseClient.from('attendance').insert([{
+                employee_id: activeUser.employee_id,
+                employee_name: activeUser.name,
+                status: 'izin',
+                leave_reason: alasan
+            }]);
+
+            if(!error) {
+                alert("Surat Izin terkirim. Semoga lekas membaik!");
+                changeView('view-thanks');
+                showMessage("");
+            } else {
+                showMessage("Gagal kirim izin", true);
+            }
+        }
+
+        // --- MANAJEMEN KAMERA ---
         let streamObj = null;
+
+        function openCamera(mode) {
+            cameraMode = mode;
+            document.getElementById('cam-title').innerText = mode === 'masuk' ? "Foto Masuk Kerja" : "Foto Pulang Kerja";
+            changeView('view-camera');
+            startCam();
+        }
 
         async function startCam() {
             document.getElementById('video').classList.remove('hidden');
@@ -181,8 +202,7 @@
                 streamObj = await navigator.mediaDevices.getUserMedia({ video: { facingMode: "user" }, audio: false });
                 document.getElementById('video').srcObject = streamObj;
             } catch (err) {
-                alert("Gagal akses kamera. Pastikan izin diberikan.");
-                changeView('view-profile');
+                alert("Izinkan kamera bro!");
             }
         }
 
@@ -202,93 +222,120 @@
             canvas.toBlob((blob) => {
                 capturedPhotoBlob = blob;
                 preview.src = URL.createObjectURL(blob);
-                
                 video.classList.add('hidden');
                 preview.classList.remove('hidden');
                 document.getElementById('btn-capture').classList.add('hidden');
                 document.getElementById('camera-actions').classList.remove('hidden');
-                
                 if(streamObj) streamObj.getTracks().forEach(track => track.stop());
             }, 'image/jpeg', 0.8);
         }
 
-        function retakePhoto() {
-            startCam(); 
+        // PENGATUR ALUR: HABIS FOTO MAU KEMANA?
+        async function processPhoto() {
+            if(!capturedPhotoBlob) return alert("Foto dulu!");
+            
+            if(cameraMode === 'masuk') {
+                // Kalo absen masuk, langsung tembak ke database
+                executeAbsenMasuk();
+            } else {
+                // Kalo absen pulang, tahan dulu, suruh isi produksi
+                changeView('view-checkout');
+            }
         }
 
-        async function submitCheckIn() {
-            if(!capturedPhotoBlob) return alert("Ambil foto dulu bos!");
-            
-            const notif = document.getElementById('notif');
-            notif.innerText = "MENGUNGGAH FOTO & ABSEN...";
-            
-            const fileName = `${activeUser.employee_id}_${Date.now()}.jpg`;
-            const { data: uploadData, error: uploadError } = await supabaseClient.storage
-                .from('photos')
-                .upload(fileName, capturedPhotoBlob, { contentType: 'image/jpeg' });
+        // --- PROSES ABSEN MASUK (AUTO TELAT) ---
+        async function executeAbsenMasuk() {
+            showMessage("MENGUNGGAH FOTO MASUK...");
+            const publicPhotoUrl = await uploadPhotoToSupabase('in');
+            if(!publicPhotoUrl) return;
 
-            if (uploadError) {
-                console.error(uploadError);
-                showMessage("GAGAL UPLOAD FOTO! Cek Bucket 'photos' di Supabase.", true);
-                return;
+            // Logika Telat (Di atas jam 08:30 pagi = Telat)
+            const now = new Date();
+            const isTelat = (now.getHours() > 8) || (now.getHours() === 8 && now.getMinutes() > 30);
+            const statusMasuk = isTelat ? 'masuk (telat)' : 'masuk';
+
+            if(isTelat) {
+                document.getElementById('status-badge').innerText = "Status: Telat";
+                document.getElementById('status-badge').className = "inline-block px-3 py-1 bg-red-500/20 text-red-400 rounded-full text-[9px] font-bold tracking-widest uppercase mb-2 border border-red-500/30";
             }
 
-            const { data: urlData } = supabaseClient.storage.from('photos').getPublicUrl(fileName);
-            const publicPhotoUrl = urlData.publicUrl;
-
-            showMessage("MEMPROSES LOKASI...");
             navigator.geolocation.getCurrentPosition(async (pos) => {
-                completeAbsenIn(pos.coords.latitude, pos.coords.longitude, publicPhotoUrl);
-            }, (err) => {
-                completeAbsenIn(0, 0, publicPhotoUrl);
+                saveMasukToDB(pos.coords.latitude, pos.coords.longitude, publicPhotoUrl, statusMasuk);
+            }, () => {
+                saveMasukToDB(0, 0, publicPhotoUrl, statusMasuk); // Mode test tetep lolos
             }, { timeout: 5000 });
         }
 
-        async function completeAbsenIn(lat, lng, photoUrl) {
+        async function saveMasukToDB(lat, lng, url, status) {
             const { error } = await supabaseClient.from('attendance').insert([{
                 employee_id: activeUser.employee_id,
                 employee_name: activeUser.name,
-                status: 'masuk',
+                status: status,
                 location: `${lat},${lng}`,
-                photo_url: photoUrl 
+                photo_url: url 
             }]);
 
             if (!error) {
-                alert("Absen Masuk Berhasil! Selamat Bekerja.");
                 changeView('view-dashboard');
-                document.getElementById('notif').innerText = "";
+                showMessage("");
             } else {
-                showMessage("GAGAL SIMPAN ABSEN: " + error.message, true);
+                showMessage("Gagal simpan absen: " + error.message, true);
             }
         }
 
-        async function submitCheckOut() {
+        // --- PROSES ABSEN PULANG (UPDATE BARIS TADI PAGI) ---
+        async function submitCheckOutFinal() {
             const prod = document.getElementById('prod-total').value;
             const isOT = document.getElementById('is-ot').checked;
-            if(!prod) return alert("INPUT HASIL KERJA PCS!");
+            if(!prod) return alert("HAYO, INPUT DULU HASIL PRESSNYA!");
+
+            showMessage("MENGUNGGAH FOTO PULANG...");
+            const publicPhotoUrl = await uploadPhotoToSupabase('out');
+            if(!publicPhotoUrl) return;
 
             showMessage("MENYIMPAN LAPORAN...");
 
-            const { error } = await supabaseClient.from('attendance').insert([{
-                employee_id: activeUser.employee_id,
-                employee_name: activeUser.name,
-                status: 'pulang',
-                production_total: parseInt(prod),
-                is_overtime: isOT
-            }]);
+            // Cari absen pagi ini
+            const { data: absenTerakhir, error: errCari } = await supabaseClient
+                .from('attendance')
+                .select('id')
+                .eq('employee_id', activeUser.employee_id)
+                .is('check_out', null)
+                .neq('status', 'izin')
+                .order('check_in', { ascending: false })
+                .limit(1);
 
-            if (!error) {
+            if (errCari || !absenTerakhir || absenTerakhir.length === 0) {
+                return alert("Gagal! Kamu belum Absen Masuk.");
+            }
+
+            // Update row tersebut
+            const { error: errUpdate } = await supabaseClient.from('attendance').update({
+                status: 'selesai',
+                check_out: new Date().toISOString(),
+                production_total: parseInt(prod),
+                is_overtime: isOT,
+                photo_out_url: publicPhotoUrl // FOTO PULANG MASUK SINI
+            }).eq('id', absenTerakhir[0].id);
+
+            if (!errUpdate) {
                 changeView('view-thanks');
-                document.getElementById('notif').innerText = "";
+                showMessage("");
             } else {
-                showMessage("GAGAL SIMPAN LAPORAN: " + error.message, true);
+                showMessage("Gagal simpan: " + errUpdate.message, true);
             }
         }
 
-        function showMessage(text, isError = false) {
-            const msgEl = document.getElementById('notif');
-            msgEl.innerText = text;
-            msgEl.className = `mt-6 text-center text-[10px] font-bold tracking-widest ${isError ? 'text-red-500' : 'text-gray-600'}`;
+        // FUNGSI UPLOAD FOTO KE BUCKET
+        async function uploadPhotoToSupabase(prefix) {
+            const fileName = `${activeUser.employee_id}_${prefix}_${Date.now()}.jpg`;
+            const { error } = await supabaseClient.storage.from('photos').upload(fileName, capturedPhotoBlob, { contentType: 'image/jpeg' });
+            if (error) {
+                showMessage("GAGAL UPLOAD FOTO!", true);
+                return null;
+            }
+            const { data } = supabaseClient.storage.from('photos').getPublicUrl(fileName);
+            return data.publicUrl;
         }
     </script>
 </body>
