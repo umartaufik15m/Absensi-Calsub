@@ -121,13 +121,13 @@
     </div>
 
     <script>
-        // INTEGRASI SUPABASE LU
+        // INTEGRASI SUPABASE (UDAH DI-FIX BENTROKNYA)
         const SB_URL = 'https://wcjzperckywcskcrhgrv.supabase.co';
         const SB_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6IndjanpwZXJja3l3Y3NrY3JoZ3J2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzU5OTk4NTksImV4cCI6MjA5MTU3NTg1OX0.0q60Bs-L3E_EWu5pg4y6GeW7jajHmEcIgdgbBjqgHQs';
-        const supabase = supabase.createClient(SB_URL, SB_KEY);
+        const supabaseClient = supabase.createClient(SB_URL, SB_KEY);
 
         let activeUser = null;
-        let capturedPhotoBlob = null; // Buat simpan file foto sementara
+        let capturedPhotoBlob = null; 
 
         function changeView(viewId) {
             document.querySelectorAll('#app > div').forEach(div => div.classList.add('hidden'));
@@ -135,60 +135,42 @@
             if(viewId === 'view-camera') startCam();
         }
 
-      async function handleLogin() {
-            // Ubah teks tombol biar kita tahu dia lagi mikir
-            const btn = document.querySelector('button[onclick="handleLogin()"]');
+        async function handleLogin() {
+            const btn = document.querySelector('#view-login button');
+            const originalText = btn.innerText;
             btn.innerText = "MEMERIKSA...";
 
             try {
-                // Tambahin .trim() biar spasi yang nggak sengaja kepencet otomatis kehapus
                 const id = document.getElementById('emp-id').value.trim();
                 const pin = document.getElementById('emp-pin').value.trim();
-                
                 if(!id || !pin) {
-                    btn.innerText = "MASUK";
-                    return alert("Isi ID & PIN dulu bos!");
+                    btn.innerText = originalText;
+                    return alert("Isi ID & PIN!");
                 }
 
-                // Cek ke Supabase
-                const { data, error } = await supabase
-                    .from('profiles')
-                    .select('*')
-                    .eq('employee_id', id)
-                    .eq('pin', pin)
-                    .single();
+                const { data, error } = await supabaseClient.from('profiles').select('*').eq('employee_id', id).eq('pin', pin).single();
 
-                // KALAU ADA ERROR DARI SUPABASE, MUNCULIN DI SINI!
-                if (error) {
-                    btn.innerText = "MASUK";
-                    alert("Gagal Login!\nError Supabase: " + error.message);
-                    console.log("Detail Error:", error);
-                    return;
-                }
-
-                if (!data) {
-                    btn.innerText = "MASUK";
+                if (error || !data) {
+                    btn.innerText = originalText;
                     alert("ID atau PIN SALAH!");
                     return;
                 }
 
-                // Kalau berhasil
                 activeUser = data;
                 document.getElementById('prof-name').innerText = data.name;
                 document.getElementById('prof-dept').innerText = data.department;
                 changeView('view-profile');
-                btn.innerText = "MASUK";
-
+                btn.innerText = originalText;
             } catch (err) {
-                btn.innerText = "MASUK";
-                alert("Wah ada error di kodenya: " + err.message);
+                btn.innerText = originalText;
+                alert("Error sistem: " + err.message);
             }
         }
-        // --- LOGIKA KAMERA BARU (CEKREK) ---
+
+        // --- LOGIKA KAMERA ---
         let streamObj = null;
 
         async function startCam() {
-            // Reset UI Kamera
             document.getElementById('video').classList.remove('hidden');
             document.getElementById('photo-preview').classList.add('hidden');
             document.getElementById('btn-capture').classList.remove('hidden');
@@ -210,38 +192,29 @@
             const preview = document.getElementById('photo-preview');
             const flash = document.getElementById('flash-screen');
 
-            // Efek Flash
             flash.style.opacity = '1';
             setTimeout(() => flash.style.opacity = '0', 100);
 
-            // Set ukuran canvas sama kayak video
             canvas.width = video.videoWidth;
             canvas.height = video.videoHeight;
-
-            // Gambar video ke canvas (Cekrek!)
             canvas.getContext('2d').drawImage(video, 0, 0, canvas.width, canvas.height);
 
-            // Ubah canvas jadi file Blob (JPEG kualitas 0.8 biar enteng)
             canvas.toBlob((blob) => {
                 capturedPhotoBlob = blob;
-                // Tampilin hasil foto ke kotak preview
                 preview.src = URL.createObjectURL(blob);
                 
-                // Tukar UI: Matikan video, tampilin foto diam, tampilin tombol kirim
                 video.classList.add('hidden');
                 preview.classList.remove('hidden');
                 document.getElementById('btn-capture').classList.add('hidden');
                 document.getElementById('camera-actions').classList.remove('hidden');
                 
-                // Matikan stream kamera biar hemat batre
                 if(streamObj) streamObj.getTracks().forEach(track => track.stop());
             }, 'image/jpeg', 0.8);
         }
 
         function retakePhoto() {
-            startCam(); // Balik ke mode live video
+            startCam(); 
         }
-        // ----------------------------------
 
         async function submitCheckIn() {
             if(!capturedPhotoBlob) return alert("Ambil foto dulu bos!");
@@ -249,9 +222,8 @@
             const notif = document.getElementById('notif');
             notif.innerText = "MENGUNGGAH FOTO & ABSEN...";
             
-            // 1. Upload Foto ke Supabase Storage (Bucket 'photos')
             const fileName = `${activeUser.employee_id}_${Date.now()}.jpg`;
-            const { data: uploadData, error: uploadError } = await supabase.storage
+            const { data: uploadData, error: uploadError } = await supabaseClient.storage
                 .from('photos')
                 .upload(fileName, capturedPhotoBlob, { contentType: 'image/jpeg' });
 
@@ -261,27 +233,24 @@
                 return;
             }
 
-            // Dapet link publik fotonya
-            const { data: urlData } = supabase.storage.from('photos').getPublicUrl(fileName);
+            const { data: urlData } = supabaseClient.storage.from('photos').getPublicUrl(fileName);
             const publicPhotoUrl = urlData.publicUrl;
 
-            // 2. Ambil GPS (Mode Test - Lanjut terus walau eror)
             showMessage("MEMPROSES LOKASI...");
             navigator.geolocation.getCurrentPosition(async (pos) => {
                 completeAbsenIn(pos.coords.latitude, pos.coords.longitude, publicPhotoUrl);
             }, (err) => {
-                // GPS Gagal (Mode Test)
                 completeAbsenIn(0, 0, publicPhotoUrl);
             }, { timeout: 5000 });
         }
 
         async function completeAbsenIn(lat, lng, photoUrl) {
-            const { error } = await supabase.from('attendance').insert([{
+            const { error } = await supabaseClient.from('attendance').insert([{
                 employee_id: activeUser.employee_id,
                 employee_name: activeUser.name,
                 status: 'masuk',
                 location: `${lat},${lng}`,
-                photo_url: photoUrl // Simpan link fotonya di tabel
+                photo_url: photoUrl 
             }]);
 
             if (!error) {
@@ -289,7 +258,7 @@
                 changeView('view-dashboard');
                 document.getElementById('notif').innerText = "";
             } else {
-                showMessage("GAGAL SIMPAN ABSEN!", true);
+                showMessage("GAGAL SIMPAN ABSEN: " + error.message, true);
             }
         }
 
@@ -300,7 +269,7 @@
 
             showMessage("MENYIMPAN LAPORAN...");
 
-            const { error } = await supabase.from('attendance').insert([{
+            const { error } = await supabaseClient.from('attendance').insert([{
                 employee_id: activeUser.employee_id,
                 employee_name: activeUser.name,
                 status: 'pulang',
@@ -312,7 +281,7 @@
                 changeView('view-thanks');
                 document.getElementById('notif').innerText = "";
             } else {
-                showMessage("GAGAL SIMPAN LAPORAN!", true);
+                showMessage("GAGAL SIMPAN LAPORAN: " + error.message, true);
             }
         }
 
