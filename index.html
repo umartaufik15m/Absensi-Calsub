@@ -17,104 +17,181 @@
             mask-image: radial-gradient(circle at center, black 40%, transparent 90%);
             z-index: -1;
         }
-        .glass-card { background: rgba(20, 20, 20, 0.7); backdrop-filter: blur(15px); border: 1px solid rgba(255, 255, 255, 0.1); }
-        .btn-glow:hover { box-shadow: 0 0 20px rgba(255, 255, 255, 0.3); }
+        .glass-card { background: rgba(15, 15, 15, 0.8); backdrop-filter: blur(20px); border: 1px solid rgba(255, 255, 255, 0.1); }
+        .gradient-icon { filter: drop-shadow(0 0 10px rgba(255, 255, 255, 0.2)); }
+        .hidden { display: none; }
     </style>
 </head>
 <body class="min-h-screen flex flex-col items-center justify-center p-4">
     <div class="cyber-grid"></div>
 
-    <img src="https://raw.githubusercontent.com/umartaufik15m/Absensi-Calsub/refs/heads/main/W%20CALSUB_page-0001.jpg" alt="Calsub Logo" class="w-48 mb-6 drop-shadow-xl">
+    <div class="mb-8 flex flex-col items-center">
+        <img src="https://raw.githubusercontent.com/umartaufik15m/Absensi-Calsub/refs/heads/main/W%20CALSUB_page-0001.jpg" alt="Logo" class="w-48 mb-2">
+        <img src="https://raw.githubusercontent.com/umartaufik15m/Absensi-Calsub/refs/heads/main/gradient.png" class="w-8 gradient-icon opacity-50">
+    </div>
 
-    <div id="app" class="glass-card p-8 rounded-[2rem] w-full max-w-md shadow-2xl transition-all duration-500">
+    <div id="app" class="glass-card p-8 rounded-[2.5rem] w-full max-w-md shadow-2xl">
         
-        <div id="login-section">
-            <h2 class="text-center text-lg font-semibold mb-6 tracking-widest text-gray-400">LOG IN PEGAWAI</h2>
+        <div id="view-login">
+            <h2 class="text-center text-sm font-bold tracking-[0.3em] mb-8 text-gray-500 uppercase">Input Identitas</h2>
             <div class="space-y-4 mb-6">
-                <input type="text" id="emp-id" placeholder="ID KARYAWAN" class="w-full p-4 bg-black/40 border border-white/10 rounded-2xl text-center focus:border-white/40 transition-all outline-none">
-                <input type="password" id="emp-pin" placeholder="PIN 4 ANGKA" class="w-full p-4 bg-black/40 border border-white/10 rounded-2xl text-center tracking-[0.8em] focus:border-white/40 transition-all outline-none">
+                <input type="text" id="emp-id" placeholder="ID PEGAWAI" class="w-full p-5 bg-white/5 border border-white/10 rounded-2xl text-center focus:border-white/40 outline-none transition-all uppercase">
+                <input type="password" id="emp-pin" placeholder="PIN" class="w-full p-5 bg-white/5 border border-white/10 rounded-2xl text-center tracking-[1em] focus:border-white/40 outline-none transition-all">
             </div>
-            <button onclick="handleLogin()" class="w-full bg-white text-black font-extrabold py-4 rounded-2xl btn-glow transition-all active:scale-95">MASUK SISTEM</button>
+            <button onclick="handleLogin()" class="w-full bg-white text-black font-black py-5 rounded-2xl hover:scale-[1.02] active:scale-95 transition-all shadow-xl">LOG IN</button>
         </div>
 
-        <div id="action-section" class="hidden text-center">
-            <h2 id="greeting" class="text-2xl font-bold mb-1">Halo, Tim Calsub</h2>
-            <p class="text-gray-500 text-sm mb-6">Siap beraksi di Bulak Kapal hari ini?</p>
-            
-            <div class="relative rounded-3xl overflow-hidden mb-6 h-48 bg-black border border-white/10">
+        <div id="view-profile" class="hidden text-center">
+            <div class="w-20 h-20 bg-white/10 rounded-full mx-auto mb-4 flex items-center justify-center border border-white/20">
+                <svg class="w-10 h-10 text-white/40" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clip-rule="evenodd"></path></svg>
+            </div>
+            <h2 id="prof-name" class="text-2xl font-black mb-1 italic">NAMA PEGAWAI</h2>
+            <p id="prof-dept" class="text-gray-500 text-sm mb-8 tracking-widest uppercase">BAGIAN</p>
+            <button onclick="changeView('view-camera')" class="w-full border-2 border-white text-white font-bold py-5 rounded-2xl hover:bg-white hover:text-black transition-all">MULAI ABSENSI</button>
+        </div>
+
+        <div id="view-camera" class="hidden text-center">
+            <h2 class="text-lg font-bold mb-4">Verifikasi Wajah</h2>
+            <div class="relative rounded-[2rem] overflow-hidden mb-6 h-64 bg-black border border-white/20 shadow-inner">
                 <video id="video" class="w-full h-full object-cover" autoplay playsinline></video>
-                <div class="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent"></div>
+                <div class="absolute inset-0 border-[6px] border-white/5 pointer-events-none rounded-[2rem]"></div>
+            </div>
+            <button onclick="submitCheckIn()" class="w-full bg-green-500 text-white font-black py-5 rounded-2xl shadow-lg shadow-green-500/20 active:scale-95 transition-all">KIRIM ABSEN MASUK</button>
+            <p class="text-[10px] text-gray-600 mt-4 uppercase tracking-tighter">Lokasi GPS akan dikirim secara otomatis</p>
+        </div>
+
+        <div id="view-dashboard" class="hidden">
+            <div class="text-center mb-8">
+                <div class="inline-block px-4 py-1 bg-green-500/20 text-green-400 rounded-full text-[10px] font-bold tracking-widest uppercase mb-4">Status: Bekerja</div>
+                <h2 class="text-xl font-black italic">SELAMAT BEKERJA!</h2>
+            </div>
+            
+            <div class="bg-white/5 rounded-3xl p-6 mb-8 border border-white/5">
+                <p class="text-xs font-bold text-gray-500 mb-4 tracking-widest uppercase">💡 Tips Hari Ini:</p>
+                <ul class="text-sm space-y-3 text-gray-300 italic">
+                    <li>✨ Membaca doa sebelum mulai.</li>
+                    <li>🎯 Fokus & teliti pada tiap detail cetakan.</li>
+                    <li>🧼 Jaga kebersihan mesin press & area kerja.</li>
+                    <li>💧 Jangan lupa minum air putih biar konsen.</li>
+                    <li>❓ Tanya leader jika ada kendala teknis.</li>
+                </ul>
             </div>
 
-            <button onclick="submitAbsen('masuk')" class="w-full border-2 border-white/20 hover:border-white/60 text-white font-bold py-4 rounded-2xl mb-4 transition-all">ABSEN MASUK</button>
-            
-            <div class="pt-6 border-t border-white/10">
-                <input type="number" id="prod-total" placeholder="Total Produksi (Pcs)" class="w-full p-4 bg-black/40 border border-white/10 rounded-2xl text-center mb-4 outline-none">
-                <label class="flex items-center justify-center space-x-3 mb-6 cursor-pointer">
-                    <input type="checkbox" id="is-ot" class="w-5 h-5 accent-white">
-                    <span class="text-sm">Saya Kerja Lembur</span>
-                </label>
-                <button onclick="submitAbsen('pulang')" class="w-full bg-white text-black font-extrabold py-4 rounded-2xl btn-glow transition-all">ABSEN PULANG & LAPOR</button>
-            </div>
+            <button onclick="changeView('view-checkout')" class="w-full border border-white/20 text-white/60 font-bold py-5 rounded-2xl hover:border-red-500 hover:text-red-500 transition-all">ABSEN PULANG</button>
         </div>
-        <p id="notif" class="mt-4 text-center text-xs font-medium"></p>
+
+        <div id="view-checkout" class="hidden text-center">
+            <h2 class="text-xl font-black italic mb-6 uppercase tracking-wider">Laporan Produksi</h2>
+            <div class="space-y-4 mb-8">
+                <div class="text-left">
+                    <label class="text-[10px] text-gray-500 ml-4 font-bold uppercase">Total Yang Dikerjakan</label>
+                    <input type="number" id="prod-total" placeholder="00" class="w-full p-5 bg-white/5 border border-white/10 rounded-2xl text-center text-3xl font-black focus:border-white/40 outline-none transition-all">
+                </div>
+                <label class="flex items-center justify-center space-x-3 cursor-pointer p-4 bg-white/5 rounded-2xl border border-white/5">
+                    <input type="checkbox" id="is-ot" class="w-5 h-5 accent-white">
+                    <span class="text-sm font-medium">Lembur hari ini</span>
+                </label>
+            </div>
+            <button onclick="submitCheckOut()" class="w-full bg-white text-black font-black py-5 rounded-2xl shadow-xl active:scale-95 transition-all">KIRIM LAPORAN PULANG</button>
+        </div>
+
+        <div id="view-thanks" class="hidden text-center py-10">
+            <div class="text-5xl mb-6">🙌</div>
+            <h2 class="text-2xl font-black italic mb-2 uppercase">TERIMA KASIH!</h2>
+            <p class="text-gray-500 text-sm">Data produksi & absensi telah kami terima.<br>Hati-hati di jalan pulang!</p>
+            <button onclick="location.reload()" class="mt-10 text-[10px] text-gray-700 font-bold tracking-widest hover:text-white uppercase underline">Log out sistem</button>
+        </div>
+
+        <p id="notif" class="mt-6 text-center text-[10px] font-bold tracking-widest text-gray-600"></p>
     </div>
 
     <script>
+        // INTEGRASI DATA SUPABASE KAMU
         const SB_URL = 'https://wcjzperckywcskcrhgrv.supabase.co';
-        const SB_KEY = 'sb_publishable_BQmfryY0U4OMSuw7g2M7CA_WR5fdO5L';
+        const SB_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6IndjanpwZXJja3l3Y3NrY3JoZ3J2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzU5OTk4NTksImV4cCI6MjA5MTU3NTg1OX0.0q60Bs-L3E_EWu5pg4y6GeW7jajHmEcIgdgbBjqgHQs';
         const supabaseClient = supabase.createClient(SB_URL, SB_KEY);
 
-        const WORKSHOP_LOC = { lat: -6.2510688, lng: 107.0253873 };
+        const WORK_LOC = { lat: -6.2510688, lng: 107.0253873 };
         let activeUser = null;
+        let attendanceId = null;
+
+        function changeView(viewId) {
+            document.querySelectorAll('#app > div').forEach(div => div.classList.add('hidden'));
+            document.getElementById(viewId).classList.remove('hidden');
+            if(viewId === 'view-camera') startCam();
+        }
 
         async function handleLogin() {
             const id = document.getElementById('emp-id').value;
             const pin = document.getElementById('emp-pin').value;
+            const notif = document.getElementById('notif');
             
+            notif.innerText = "OTENTIKASI...";
             const { data, error } = await supabaseClient.from('profiles').select('*').eq('employee_id', id).eq('pin', pin).single();
 
             if (error || !data) {
-                document.getElementById('notif').innerText = "ID atau PIN salah!";
-                document.getElementById('notif').className = "mt-4 text-center text-xs text-red-500";
+                notif.innerText = "ID/PIN TIDAK VALID!";
+                notif.classList.add('text-red-500');
                 return;
             }
 
             activeUser = data;
-            document.getElementById('login-section').classList.add('hidden');
-            document.getElementById('action-section').classList.remove('hidden');
-            document.getElementById('greeting').innerText = "Halo, " + data.name;
-            startCam();
+            document.getElementById('prof-name').innerText = data.name;
+            document.getElementById('prof-dept').innerText = data.department;
+            changeView('view-profile');
+            notif.innerText = "";
         }
 
         async function startCam() {
-            const stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: "user" } });
-            document.getElementById('video').srcObject = stream;
+            try {
+                const stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: "user" } });
+                document.getElementById('video').srcObject = stream;
+            } catch (err) {
+                alert("IZINKAN KAMERA UNTUK LANJUT");
+            }
         }
 
-        async function submitAbsen(tipe) {
-            document.getElementById('notif').innerText = "Memproses...";
+        async function submitCheckIn() {
+            const notif = document.getElementById('notif');
+            notif.innerText = "MENGIRIM LOKASI & FOTO...";
             
             navigator.geolocation.getCurrentPosition(async (pos) => {
-                const prod = document.getElementById('prod-total').value || 0;
-                const ot = document.getElementById('is-ot').checked;
-
-                const { error } = await supabaseClient.from('attendance').insert([{
+                const { data, error } = await supabaseClient.from('attendance').insert([{
                     employee_id: activeUser.employee_id,
                     employee_name: activeUser.name,
-                    status: tipe,
-                    location: `${pos.coords.latitude},${pos.coords.longitude}`,
-                    production_total: parseInt(prod),
-                    is_overtime: ot
-                }]);
+                    status: 'masuk',
+                    location: `${pos.coords.latitude},${pos.coords.longitude}`
+                }]).select();
 
                 if (!error) {
-                    alert(`Berhasil ${tipe}!`);
-                    location.reload();
+                    attendanceId = data[0].id;
+                    changeView('view-dashboard');
+                    notif.innerText = "";
                 } else {
-                    alert("Gagal koneksi database.");
+                    alert("DATABASE ERROR");
                 }
             });
+        }
+
+        async function submitCheckOut() {
+            const prod = document.getElementById('prod-total').value;
+            const isOT = document.getElementById('is-ot').checked;
+            
+            if(!prod) return alert("INPUT TOTAL PRODUKSI!");
+
+            const { error } = await supabaseClient.from('attendance').insert([{
+                employee_id: activeUser.employee_id,
+                employee_name: activeUser.name,
+                status: 'pulang',
+                production_total: parseInt(prod),
+                is_overtime: isOT
+            }]);
+
+            if (!error) {
+                changeView('view-thanks');
+            } else {
+                alert("GAGAL KIRIM LAPORAN");
+            }
         }
     </script>
 </body>
