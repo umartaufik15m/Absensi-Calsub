@@ -22,60 +22,66 @@
         .hidden { display: none; }
     </style>
 </head>
-<body class="min-h-screen flex flex-col items-center justify-center p-4">
+<body class="min-h-screen flex flex-col items-center justify-center p-4 text-center">
     <div class="cyber-grid"></div>
 
     <div class="mb-10 flex flex-col items-center">
-        <img src="https://raw.githubusercontent.com/umartaufik15m/Absensi-Calsub/refs/heads/main/gradient.png" class="w-20 gradient-icon mb-4">
-        <h1 class="text-3xl font-black italic tracking-widest text-white">CALSUB<span class="text-gray-500">.ID</span></h1>
+        <img src="https://raw.githubusercontent.com/umartaufik15m/Absensi-Calsub/refs/heads/main/gradient.png" class="w-16 gradient-icon mb-4">
+        <h1 class="text-2xl font-black italic tracking-widest">CALSUB<span class="text-gray-500">.ID</span></h1>
     </div>
 
-    <div id="app" class="glass-card p-8 rounded-[2.5rem] w-full max-w-sm shadow-2xl border-t border-white/20">
+    <div id="app" class="glass-card p-8 rounded-[2.5rem] w-full max-w-sm shadow-2xl">
         
         <div id="view-login">
-            <h2 class="text-center text-[10px] font-bold tracking-[0.4em] mb-8 text-gray-500 uppercase">Akses Pegawai</h2>
+            <h2 class="text-[10px] font-bold tracking-[0.4em] mb-8 text-gray-500 uppercase">Verifikasi Identitas</h2>
             <div class="space-y-4 mb-6">
-                <input type="text" id="emp-id" placeholder="ID PEGAWAI" class="w-full p-5 bg-white/5 border border-white/10 rounded-2xl text-center focus:border-white/40 outline-none transition-all uppercase font-bold">
-                <input type="password" id="emp-pin" placeholder="PIN" class="w-full p-5 bg-white/5 border border-white/10 rounded-2xl text-center tracking-[1em] focus:border-white/40 outline-none transition-all">
+                <input type="text" id="emp-id" placeholder="ID PEGAWAI" class="w-full p-5 bg-white/5 border border-white/10 rounded-2xl text-center focus:border-white/40 outline-none uppercase font-bold">
+                <input type="password" id="emp-pin" placeholder="PIN" class="w-full p-5 bg-white/5 border border-white/10 rounded-2xl text-center tracking-[1em] focus:border-white/40 outline-none">
             </div>
-            <button onclick="handleLogin()" class="w-full bg-white text-black font-black py-5 rounded-2xl hover:bg-gray-200 active:scale-95 transition-all shadow-[0_0_20px_rgba(255,255,255,0.2)]">MASUK</button>
+            <button onclick="handleLogin()" class="w-full bg-white text-black font-black py-5 rounded-2xl active:scale-95 transition-all shadow-xl">MASUK</button>
         </div>
 
-        <div id="view-dashboard" class="hidden">
-            <div class="text-center mb-8">
-                <p id="prof-name" class="text-2xl font-black italic mb-1 uppercase">NAMA PEGAWAI</p>
-                <p id="prof-dept" class="text-[10px] text-gray-500 tracking-widest font-bold mb-6 uppercase">BAGIAN</p>
-                
-                <div class="bg-white/5 rounded-3xl p-6 border border-white/5 text-left">
-                    <p class="text-[10px] font-bold text-gray-500 mb-3 tracking-widest uppercase">💡 Tips Kerja:</p>
-                    <ul class="text-xs space-y-3 text-gray-300">
-                        <li class="flex items-start"><span class="mr-2">✨</span> Baca doa dulu biar berkah.</li>
-                        <li class="flex items-start"><span class="mr-2">🎯</span> Fokus & teliti tiap detail press.</li>
-                        <li class="flex items-start"><span class="mr-2">🧼</span> Area kerja tetap bersih, ya!</li>
-                        <li class="flex items-start"><span class="mr-2">❓</span> Ada kendala? Langsung tanya leader.</li>
-                    </ul>
-                </div>
+        <div id="view-profile" class="hidden">
+            <div class="w-20 h-20 bg-white/5 rounded-full mx-auto mb-4 border border-white/10 flex items-center justify-center">
+                <span class="text-3xl">👤</span>
             </div>
-
-            <div class="space-y-3">
-                <button onclick="changeView('view-camera')" class="w-full bg-white text-black font-black py-5 rounded-2xl active:scale-95 transition-all">MULAI ABSENSI</button>
-                <button onclick="changeView('view-checkout')" class="w-full border border-white/10 text-gray-500 font-bold py-4 rounded-2xl hover:text-red-500 transition-all">LAPOR SELESAI</button>
-            </div>
+            <h2 id="prof-name" class="text-2xl font-black italic mb-1 uppercase">NAMA</h2>
+            <p id="prof-dept" class="text-[10px] text-gray-500 tracking-widest font-bold mb-8 uppercase">BAGIAN</p>
+            <button onclick="changeView('view-camera')" class="w-full border-2 border-white text-white font-black py-5 rounded-2xl active:scale-95 transition-all">MULAI ABSENSI</button>
         </div>
 
-        <div id="view-camera" class="hidden text-center">
+        <div id="view-camera" class="hidden">
             <h2 class="text-lg font-bold mb-4">Verifikasi Wajah</h2>
             <div class="relative rounded-[2rem] overflow-hidden mb-6 h-64 bg-black border border-white/20">
                 <video id="video" class="w-full h-full object-cover" autoplay playsinline></video>
-                <div class="absolute inset-0 border-[4px] border-white/5 pointer-events-none rounded-[2rem]"></div>
+                <div class="absolute inset-0 border-[6px] border-white/5 pointer-events-none rounded-[2rem]"></div>
             </div>
             <button onclick="submitCheckIn()" class="w-full bg-green-500 text-white font-black py-5 rounded-2xl shadow-lg active:scale-95 transition-all">KIRIM ABSEN MASUK</button>
         </div>
 
-        <div id="view-checkout" class="hidden text-center">
-            <h2 class="text-xl font-black italic mb-6 uppercase">Laporan Produksi</h2>
+        <div id="view-dashboard" class="hidden text-left">
+            <div class="text-center mb-6">
+                <div class="inline-block px-3 py-1 bg-green-500/20 text-green-400 rounded-full text-[9px] font-bold tracking-widest uppercase mb-2">Status: Bekerja</div>
+                <h2 class="text-xl font-black italic uppercase">Selamat Bekerja!</h2>
+            </div>
+            
+            <div class="bg-white/5 rounded-3xl p-5 mb-8 border border-white/5">
+                <p class="text-[10px] font-bold text-gray-500 mb-4 tracking-widest uppercase">💡 Tips Hari Ini:</p>
+                <ul class="text-[11px] space-y-3 text-gray-300 italic">
+                    <li>• Membaca doa sebelum mulai.</li>
+                    <li>• Fokus & teliti pada tiap detail press.</li>
+                    <li>• Jaga kebersihan mesin & area kerja.</li>
+                    <li>• Tanya leader jika ada kendala.</li>
+                </ul>
+            </div>
+
+            <button onclick="changeView('view-checkout')" class="w-full border border-white/10 text-gray-500 font-bold py-5 rounded-2xl hover:text-red-500 transition-all">ABSEN PULANG</button>
+        </div>
+
+        <div id="view-checkout" class="hidden">
+            <h2 class="text-xl font-black italic mb-6 uppercase">Hasil Produksi</h2>
             <div class="space-y-4 mb-8">
-                <input type="number" id="prod-total" placeholder="HASIL PRESS (PCS)" class="w-full p-5 bg-white/5 border border-white/10 rounded-2xl text-center text-3xl font-black outline-none">
+                <input type="number" id="prod-total" placeholder="TOTAL PCS" class="w-full p-5 bg-white/5 border border-white/10 rounded-2xl text-center text-3xl font-black outline-none">
                 <label class="flex items-center justify-center space-x-3 cursor-pointer p-4 bg-white/5 rounded-2xl border border-white/5">
                     <input type="checkbox" id="is-ot" class="w-5 h-5 accent-white">
                     <span class="text-sm font-medium">Lembur</span>
@@ -84,11 +90,11 @@
             <button onclick="submitCheckOut()" class="w-full bg-white text-black font-black py-5 rounded-2xl shadow-xl active:scale-95 transition-all">SIMPAN & PULANG</button>
         </div>
 
-        <div id="view-thanks" class="hidden text-center py-10">
+        <div id="view-thanks" class="hidden py-10">
             <div class="text-5xl mb-6">🙌</div>
-            <h2 class="text-2xl font-black italic mb-2">TERIMA KASIH!</h2>
-            <p class="text-gray-500 text-sm">Data sudah masuk.<br>Hati-hati di jalan!</p>
-            <button onclick="location.reload()" class="mt-8 text-[10px] text-gray-700 font-bold uppercase underline">Kembali</button>
+            <h2 class="text-2xl font-black italic mb-2 uppercase tracking-wide">Terima Kasih!</h2>
+            <p class="text-gray-500 text-sm">Data laporan sudah masuk.<br>Hati-hati di jalan pulang!</p>
+            <button onclick="location.reload()" class="mt-10 text-[10px] text-gray-700 font-bold uppercase underline">Log Out</button>
         </div>
 
         <p id="notif" class="mt-6 text-center text-[10px] font-bold tracking-widest text-gray-600"></p>
@@ -99,6 +105,7 @@
         const SB_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6IndjanpwZXJja3l3Y3NrY3JoZ3J2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzU5OTk4NTksImV4cCI6MjA5MTU3NTg1OX0.0q60Bs-L3E_EWu5pg4y6GeW7jajHmEcIgdgbBjqgHQs';
         const supabaseClient = supabase.createClient(SB_URL, SB_KEY);
 
+        const WORK_LOC = { lat: -6.2510688, lng: 107.0253873 };
         let activeUser = null;
 
         function changeView(viewId) {
@@ -110,27 +117,30 @@
         async function handleLogin() {
             const id = document.getElementById('emp-id').value;
             const pin = document.getElementById('emp-pin').value;
-            
             const { data, error } = await supabaseClient.from('profiles').select('*').eq('employee_id', id).eq('pin', pin).single();
 
             if (error || !data) {
-                alert("ID atau PIN SALAH!");
+                alert("ID ATAU PIN SALAH!");
                 return;
             }
 
             activeUser = data;
             document.getElementById('prof-name').innerText = data.name;
             document.getElementById('prof-dept').innerText = data.department;
-            changeView('view-dashboard');
+            changeView('view-profile');
         }
 
         async function startCam() {
-            const stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: "user" } });
-            document.getElementById('video').srcObject = stream;
+            try {
+                const stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: "user" } });
+                document.getElementById('video').srcObject = stream;
+            } catch (err) {
+                alert("IZINKAN KAMERA UNTUK LANJUT");
+            }
         }
 
         async function submitCheckIn() {
-            document.getElementById('notif').innerText = "MENGIRIM DATA...";
+            document.getElementById('notif').innerText = "PROSES DATA...";
             navigator.geolocation.getCurrentPosition(async (pos) => {
                 const { error } = await supabaseClient.from('attendance').insert([{
                     employee_id: activeUser.employee_id,
@@ -140,17 +150,20 @@
                 }]);
 
                 if (!error) {
+                    alert("Absen Masuk Diterima! (Mode Test)");
                     changeView('view-dashboard');
                     document.getElementById('notif').innerText = "";
-                    alert("Absen Masuk Berhasil!");
                 }
+            }, (err) => {
+                alert("GPS Gagal, tapi tetap diproses (Mode Test)");
+                changeView('view-dashboard');
             });
         }
 
         async function submitCheckOut() {
             const prod = document.getElementById('prod-total').value;
             const isOT = document.getElementById('is-ot').checked;
-            if(!prod) return alert("ISI HASIL PRODUKSI!");
+            if(!prod) return alert("INPUT HASIL KERJA!");
 
             const { error } = await supabaseClient.from('attendance').insert([{
                 employee_id: activeUser.employee_id,
