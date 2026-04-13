@@ -73,16 +73,16 @@
     </div>
 
     <script>
-        // KONEKSI SUPABASE LU
+        // KONEKSI SUPABASE (BENTROK NAMA UDAH DI-FIX)
         const SB_URL = 'https://wcjzperckywcskcrhgrv.supabase.co';
         const SB_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6IndjanpwZXJja3l3Y3NrY3JoZ3J2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzU5OTk4NTksImV4cCI6MjA5MTU3NTg1OX0.0q60Bs-L3E_EWu5pg4y6GeW7jajHmEcIgdgbBjqgHQs';
-        const supabase = supabase.createClient(SB_URL, SB_KEY);
+        const supabaseClient = supabase.createClient(SB_URL, SB_KEY);
         let myChartInstance = null;
 
         // BIKIN PASSWORD SEDERHANA BUAT ADMIN
         function cekAdmin() {
             const pin = document.getElementById('admin-pin').value;
-            if(pin === '8899') { // <-- INI PASSWORD ADMIN LU (8899)
+            if(pin === '8899') { // <-- INI PASSWORD ADMIN LU
                 document.getElementById('login-admin').classList.add('hidden');
                 document.getElementById('dashboard').classList.remove('hidden');
                 loadData();
@@ -96,7 +96,7 @@
             const today = new Date().toISOString().split('T')[0];
 
             // Tarik data absen dari Supabase
-            const { data, error } = await supabase
+            const { data, error } = await supabaseClient
                 .from('attendance')
                 .select('*')
                 .gte('check_in', today + 'T00:00:00Z') // Hanya data hari ini
@@ -123,14 +123,14 @@
 
                 // Siapin data buat Tabel
                 let badgeColor = row.status === 'selesai' ? 'bg-green-500/20 text-green-400' : 'bg-yellow-500/20 text-yellow-400';
-                let photoLink = row.photo_url ? `<a href="${row.photo_url}" target="_blank" class="text-blue-400 underline">Lihat</a>` : '-';
+                let photoLink = row.photo_url ? `<a href="${row.photo_url}" target="_blank" class="text-blue-400 underline font-bold hover:text-blue-300">Lihat Foto</a>` : '-';
                 
                 tableHTML += `
                     <tr class="border-b border-white/5">
-                        <td class="py-3 font-bold">${row.employee_name}</td>
-                        <td class="py-3"><span class="px-2 py-1 rounded text-xs ${badgeColor} uppercase">${row.status}</span></td>
-                        <td class="py-3 font-black text-blue-300">${row.production_total || 0}</td>
-                        <td class="py-3">${photoLink}</td>
+                        <td class="py-4 font-bold text-gray-200">${row.employee_name}</td>
+                        <td class="py-4"><span class="px-3 py-1 rounded-full text-[10px] font-bold tracking-widest border border-white/10 ${badgeColor} uppercase">${row.status}</span></td>
+                        <td class="py-4 font-black text-blue-300 text-lg">${row.production_total || 0}</td>
+                        <td class="py-4">${photoLink}</td>
                     </tr>
                 `;
             });
@@ -152,13 +152,13 @@
             if(myChartInstance) myChartInstance.destroy();
 
             myChartInstance = new Chart(ctx, {
-                type: 'bar', // Jenis grafik batang
+                type: 'bar', 
                 data: {
                     labels: labels,
                     datasets: [{
                         label: 'Hasil Press (Pcs)',
                         data: data,
-                        backgroundColor: '#3b82f6', // Warna biru Tailwind
+                        backgroundColor: '#3b82f6', // Warna biru 
                         borderRadius: 8
                     }]
                 },
@@ -166,7 +166,7 @@
                     responsive: true,
                     plugins: { legend: { display: false } },
                     scales: { 
-                        y: { beginAtZero: true, grid: { color: 'rgba(255,255,255,0.1)' } },
+                        y: { beginAtZero: true, grid: { color: 'rgba(255,255,255,0.05)' } },
                         x: { grid: { display: false } }
                     }
                 }
